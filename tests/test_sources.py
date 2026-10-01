@@ -102,12 +102,12 @@ def test_no_source() -> None:
         pytest.fail(reason="Preparation must reject absent sources.")
 
 
-@pytest.mark.skipif(
-    sys.platform == "win32", reason="Windows has no POSIX FIFO"
-)
 def test_special_file_rejected(tmp_path: Path) -> None:
     """Reject pipes before copying, avoiding a blocking read."""
-    os.mkfifo(path=tmp_path / "pipe")
+    if sys.platform != "win32":
+        os.mkfifo(path=tmp_path / "pipe")
+    else:
+        pytest.skip(reason="Windows has no POSIX FIFO")
     transport = recording_transport(status=200, failure=None)
     result = CliRunner().invoke(
         cli=create_cli(transport=transport),
