@@ -12,17 +12,15 @@ projects.
 Language-specific coding-question stubs are outside this CLI's initial scope.
 
 Requires Python 3.13 or later.
-No package release has been published yet.
-Install the checkout for now:
+Install from PyPI:
 
 .. code-block:: console
 
-   uv sync --locked
-   uv run hackerrank --help
-   uv run python -m hackerrank_cli --version
+   uv tool install hackerrank-cli
+   hackerrank --help
+   hackerrank --version
 
-After the first PyPI release, install with ``uv tool install hackerrank-cli``
-or ``pip install hackerrank-cli``.
+You can also install with ``pip install hackerrank-cli``.
 
 Usage
 -----
@@ -112,7 +110,8 @@ Development and distribution
 Development checks, release setup, and build instructions for Docker, Nix, and
 standalone binaries are in ``docs/source/development.rst``.
 The generated CLI reference is in ``docs/source/cli.rst``.
-There are no prebuilt artifacts yet.
+Prebuilt binaries are available from
+`GitHub Releases <https://github.com/adamtheturtle/hackerrank-cli/releases>`_.
 
 See ``docs/source/migration.rst`` for migrating an existing shell uploader and
 keeping repository-specific snippet preparation outside this CLI.
