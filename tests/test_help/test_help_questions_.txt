@@ -6,4 +6,5 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  upload  Replace project starter files while preserving question metadata.
+  archive  Export a project ZIP without credentials or network access.
+  upload   Replace project starter files while preserving question metadata.

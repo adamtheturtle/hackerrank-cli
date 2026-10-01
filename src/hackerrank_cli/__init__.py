@@ -1,9 +1,12 @@
 """Upload project starter code using the released HackerRank SDK."""
 
 import os
+from collections.abc import Generator
+from contextlib import contextmanager
 from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
+from typing import BinaryIO
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 import click
@@ -84,27 +87,64 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
             transport=transport,
         )
 
+    @click.option(
+        "--directory",
+        type=click.Path(path_type=Path, readable=False),
+        help="Project directory.",
+    )
+    @click.option(
+        "--file",
+        "source_file",
+        type=click.Path(path_type=Path, readable=False),
+        help="One starter file, packaged as a single-file project archive.",
+    )
+    @click.option(
+        "--exclude",
+        multiple=True,
+        help="Additional Gitignore pattern at the upload root. Repeatable.",
+    )
+    @click.option(
+        "--output",
+        type=click.File(mode="xb", lazy=True),
+        required=True,
+        help=(
+            "New ZIP file, or - for binary standard output. "
+            "Never overwrites files."
+        ),
+    )
+    def archive(
+        directory: Path | None,
+        source_file: Path | None,
+        exclude: tuple[str, ...],
+        output: BinaryIO,
+    ) -> None:
+        """Export a project ZIP without credentials or network access."""
+        _validate_source(
+            directory=directory, source_file=source_file, exclude=exclude
+        )
+        with (
+            _preparation_errors(),
+            prepare_source(
+                directory=directory, file=source_file, excludes=exclude
+            ) as source,
+        ):
+            contents = _project_zip(source=source)
+            _ = output.write(contents)
+
+    _ = questions.command()(archive)
     _ = questions.command()(upload)
     return cli
 
 
-def _validate_upload(
-    question_id: str,
+def _validate_source(
     directory: Path | None,
     source_file: Path | None,
     exclude: tuple[str, ...],
 ) -> None:
-    """Validate command combinations and the question identifier."""
+    """Validate the shared archive and upload source options."""
     if (directory is None) == (source_file is None):
         msg = "Provide exactly one of --directory or --file."
         raise click.UsageError(message=msg)
-    if (
-        not question_id.isascii()
-        or not question_id.isdecimal()
-        or int(question_id) < 1
-    ):
-        msg = "QUESTION_ID must be a positive decimal integer."
-        raise click.BadParameter(message=msg, param_hint="QUESTION_ID")
     if len(exclude) > 0 and directory is None:
         msg = "--exclude requires --directory."
         raise click.UsageError(message=msg)
@@ -187,30 +227,45 @@ def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
     transport: Transport | None,
 ) -> None:
     """Prepare every byte before credentials or a network mutation."""
-    _validate_upload(
-        question_id=question_id,
+    _validate_source(
         directory=directory,
         source_file=source_file,
         exclude=exclude,
     )
-    try:
-        with prepare_source(
+    if (
+        not question_id.isascii()
+        or not question_id.isdecimal()
+        or int(question_id) < 1
+    ):
+        msg = "QUESTION_ID must be a positive decimal integer."
+        raise click.BadParameter(message=msg, param_hint="QUESTION_ID")
+    with (
+        _preparation_errors(),
+        prepare_source(
             directory=directory, file=source_file, excludes=exclude
-        ) as source:
-            archive = _project_zip(source=source)
-            target = f"HackerRank project question {question_id}"
-            if dry_run:
-                click.echo(message=f"Would update {target}")
-                for path in source.files:
-                    click.echo(message=f"  {path}")
-                return
-            _send_upload(
-                question_id=question_id,
-                archive=archive,
-                retries=retries,
-                transport=transport,
-            )
-            click.echo(message=f"Updated {target}")
+        ) as source,
+    ):
+        archive = _project_zip(source=source)
+        target = f"HackerRank project question {question_id}"
+        if dry_run:
+            click.echo(message=f"Would update {target}")
+            for path in source.files:
+                click.echo(message=f"  {path}")
+            return
+        _send_upload(
+            question_id=question_id,
+            archive=archive,
+            retries=retries,
+            transport=transport,
+        )
+        click.echo(message=f"Updated {target}")
+
+
+@contextmanager
+def _preparation_errors() -> Generator[None]:
+    """Report source and archive errors consistently for both commands."""
+    try:
+        yield
     except UnicodeError:
         msg = ".gitignore files must be valid UTF-8."
         raise click.ClickException(message=msg) from None

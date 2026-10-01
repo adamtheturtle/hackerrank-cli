@@ -62,6 +62,27 @@ repeatable upload.
 The CLI adds no separate retry loop.
 Each attempt uses the same prepared archive bytes.
 
+Offline archives
+----------------
+
+Export the same project ZIP locally without a question ID, credentials, or
+network access:
+
+.. code-block:: console
+
+   hackerrank questions archive --directory ./starter --exclude '*.zip' --output ./starter.zip
+   hackerrank questions archive --file ./starter.py --output - > ./starter.zip
+
+``--output`` is required.
+A file destination must not already exist; ``-`` writes only ZIP bytes to
+standard output.
+Shell redirection controls whether its destination is overwritten.
+Source validation and packaging finish before the output is opened.
+The source options, ignore rules, file contents, and executable permissions
+match ``questions upload``.
+Consumers can extract this archive for local checks, then send its bytes with
+the SDK's ``questions.upload_project_zip`` method.
+
 Directory selection
 -------------------
 
