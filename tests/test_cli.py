@@ -42,10 +42,10 @@ class RecordingTransport(Transport):
     requests: list[Request] = field(default_factory=_empty_requests)
     metadata: dict[str, str] = field(
         default_factory=lambda: {
-            "title": "Synthetic example",
-            "description": "Keep these notes",
-            "language": "python",
-            "solution": "existing solution",
+            "name": "Synthetic example",
+            "problem_statement": "Keep these notes",
+            "role_type": "backend",
+            "internal_notes": "existing notes",
         }
     )
 

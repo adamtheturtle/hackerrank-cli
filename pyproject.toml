@@ -19,6 +19,7 @@ classifiers = [
 ]
 dynamic = [ "version" ]
 dependencies = [ "click>=8.3,<8.6", "hackerrank>=2026.9.16", "httpx>=0.28", "httpx2>=2.12", "pathspec>=1" ]
+urls.Documentation = "https://adamtheturtle.github.io/hackerrank-cli/"
 urls.Issues = "https://github.com/adamtheturtle/hackerrank-cli/issues"
 urls.Source = "https://github.com/adamtheturtle/hackerrank-cli"
 scripts.hackerrank = "hackerrank_cli:main"

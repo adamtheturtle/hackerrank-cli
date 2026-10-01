@@ -82,10 +82,11 @@ External setup
 
 * Register a PyPI trusted publisher for project ``hackerrank-cli``, owner
   ``adamtheturtle``, repository ``hackerrank-cli``, workflow ``release.yml``,
-  environment ``release``. Create that GitHub environment with appropriate
-  protection before releasing. No PyPI token is stored in the repository.
-* Enable GitHub Pages with the GitHub Actions source before manually running
-  ``publish-site.yml``. CI builds documentation without deploying it.
+  environment ``release``. That GitHub environment already exists.
+  No PyPI token is stored in the repository.
+* GitHub Pages is already enabled with the GitHub Actions source. Manually
+  run ``publish-site.yml`` from ``main`` to redeploy documentation.
+  Ordinary CI builds documentation without deploying it.
 * Allow Actions to create GitHub Releases and publish the repository's GHCR
   package. Make the GHCR package public after the first release if needed.
 * Configure the five macOS signing and notarization repository secrets in
@@ -94,5 +95,8 @@ External setup
 * No Homebrew tap, winget manifest, package-manager registration, or
   TestPyPI configuration has been created. Do not advertise
   those installation paths until they exist.
-* Configure branch protection and required checks after the first CI run.
-  The public repository's tests and builds do not need a HackerRank key.
+
+The default branch already requires 15 Actions checks: tests on Python 3.13
+and 3.14 across Linux, macOS, and Windows, lint, documentation, packaging, two
+Nix builds, three standalone binaries, and autofix. The public repository's
+tests and builds do not need a HackerRank token.
