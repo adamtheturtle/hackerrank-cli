@@ -5,8 +5,8 @@ Releases are assembled from ``newsfragments/`` using Towncrier.
 
 .. towncrier release notes start
 
-2026.10.1 (2026-10-01)
-----------------------
+2026.10.1.1 (2026-10-01)
+------------------------
 
 Features
 ~~~~~~~~
