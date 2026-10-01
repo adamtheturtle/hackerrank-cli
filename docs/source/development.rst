@@ -105,7 +105,7 @@ External setup
   configuration has been created.
   Do not advertise those installation paths until they exist.
 
-The default branch already requires 15 Actions checks: tests on Python 3.13 and
+The default branch already requires 16 Actions checks: tests on Python 3.13 and
 3.14 across Linux, macOS, and Windows, lint, documentation, packaging, two Nix
 builds, three standalone binaries, and autofix.
 The public repository's tests and builds do not need a HackerRank token.
@@ -132,3 +132,25 @@ keyword-only parameters, documentation examples, shell commands, and Actions
 security alongside the four strict type checkers and branch coverage.
 Generated version files are excluded from source checks.
 The SDK owns its HTTP client and models.
+
+Literalizer CLI check parity
+----------------------------
+
+Additional checks follow ``literalizer-cli`` at commit
+``cf435b8ee67dd9900d795a8438622ad02aaaf730``.
+The dedicated ``uv-lock`` hook checks that dependency metadata and the lockfile
+agree.
+All Python source files are checked, including documentation and binary
+wrappers.
+Tests run in parallel and check runtime types in the public package, tests, and
+fixtures.
+Help text for every command is compared with committed regression snapshots.
+Review any help change before updating snapshots:
+
+.. code-block:: shell
+
+   uv run --locked pytest tests/test_help.py --regen-all --no-cov
+
+CI runs all hook stages on Linux and Windows and runs daily on ``main``.
+The existing stricter lint, documentation, and workflow security checks remain
+enabled.

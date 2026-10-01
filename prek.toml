@@ -407,7 +407,7 @@ hooks = [
   {
     id = "pylint",
     name = "pylint",
-    entry = "uv run --locked pylint bin/ src/ tests/ docs/source/conf.py",
+    entry = "uv run --locked pylint bin/ src/ tests/ docs/",
     language = "system",
     stages = ["manual"],
     groups = ["pylint"],
@@ -659,6 +659,22 @@ hooks = [
     types_or = ["rst"],
 
     priority = 500,
+    stages = ["pre-commit"],
+    groups = ["fast"]
+  }
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+  {
+    id = "uv-lock",
+    name = "uv lock",
+    entry = "uv lock --locked",
+    language = "system",
+    pass_filenames = false,
+    files = '(^pyproject\.toml$|^uv\.lock$)',
+    priority = 95,
     stages = ["pre-commit"],
     groups = ["fast"]
   }

@@ -1,0 +1,15 @@
+Usage: hackerrank questions upload [OPTIONS] QUESTION_ID
+
+  Replace project starter files while preserving question metadata.
+
+Options:
+  --directory PATH         Project directory.
+  --file PATH              One starter file, uploaded as a single-file project
+                           archive.
+  --exclude TEXT           Additional Gitignore pattern at the upload root.
+                           Repeatable.
+  --dry-run                Validate and list files without credentials or
+                           network access.
+  --retries INTEGER RANGE  Retry count delegated to the SDK for this repeatable
+                           upload.  [default: 0; x>=0]
+  --help                   Show this message and exit.

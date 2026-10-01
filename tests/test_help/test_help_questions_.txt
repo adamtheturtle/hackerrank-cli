@@ -1,0 +1,9 @@
+Usage: hackerrank questions [OPTIONS] COMMAND [ARGS]...
+
+  Manage project-question starter files.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  upload  Replace project starter files while preserving question metadata.
