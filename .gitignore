@@ -12,3 +12,7 @@ build/
 dist/
 docs/build/
 *.spec
+styles/ai-tells/
+doccmd_*
+.pyrefly_cache/
+styles/config/

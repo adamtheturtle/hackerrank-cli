@@ -5,7 +5,9 @@ requires = [ "setuptools>=77", "setuptools-scm>=8.1" ]
 [project]
 name = "hackerrank-cli"
 description = "Upload starter files to existing HackerRank project questions."
-readme = { file = "README.rst", content-type = "text/x-rst" }
+readme.content-type = "text/x-rst"
+readme.file = "README.rst"
+keywords = [ "cli", "hackerrank", "starter-code" ]
 license = "MIT"
 authors = [ { name = "Adam Dangoor", email = "adamdangoor@gmail.com" } ]
 requires-python = ">=3.13"
@@ -28,24 +30,46 @@ scripts.hackerrank = "hackerrank_cli:main"
 dev = [
   "actionlint-py==1.7.12.25",
   "build==1.6.1",
+  "check-manifest==0.51",
   "check-wheel-contents==0.6.3",
+  "deptry==0.25.1",
   "doc8==2",
+  "doccmd==2026.9.16.1",
   "furo==2025.12.19",
+  "interrogate==1.7.0",
   "mypy==2.3.1",
+  "mypy-strict-kwargs==2026.8.25.1",
+  "no-defaults==2026.9.1",
   "prek==0.5.4",
+  "pydocstringformatter==1.0.0",
+  "pylint[spelling]==4.0.9",
+  "pylint-per-file-ignores==3.2.1",
   "pyproject-fmt==2.29.4",
   "pyrefly==1.3.1",
   "pyright==1.1.414",
+  "pyroma==5.0.1",
   "pytest==9.1.1",
+  "pytest-beartype==0.3.0",
   "pytest-cov==7.1",
   "respx==0.23.1",
   "ruff==0.16.9",
+  "setuptools>=77",
+  "setuptools-scm>=8.1",
+  "shellcheck-py==0.11.0.1",
+  "shfmt-py==4.2.0",
+  "snapper-fmt==0.11.7",
   "sphinx>=8.1.3",
   "sphinx-click==6.2",
   "sphinx-lint==1.0.2",
+  "sphinxcontrib-spelling==8.0.2",
+  "strict-kwargs==2026.8.28.post2",
   "towncrier==26.9",
   "twine==7.0.0",
   "ty==0.0.84",
+  "vale==3.22.0.0",
+  "vulture==2.16",
+  "yamlfix==1.19.1",
+  "zizmor==1.30.1",
 ]
 binary = [ "pyinstaller>=6.12" ]
 
@@ -58,18 +82,108 @@ zip-safe = false
 version_file = "src/hackerrank_cli/_version.py"
 version_scheme = "post-release"
 
+[tool.uv]
+required-version = "==0.12.19"
+
 [tool.ruff]
 line-length = 79
 extend-exclude = [ "src/hackerrank_cli/_version.py" ]
 lint.select = [ "ALL" ]
-lint.ignore = [
-  "COM812", # Conflicts with the formatter.
-  "CPY001", # License is in LICENSE.
-  "D203",
-  "D213",   # Use Google docstring convention.
-]
+# COM812 conflicts with formatting; the license is in LICENSE.
+# D203/D213 select Google style. D205 matches Literalizer's wrapped summaries.
+lint.ignore = [ "COM812", "CPY001", "D203", "D205", "D213" ]
+lint.explicit-preview-rules = true
 lint.per-file-ignores."tests/*.py" = [ "S101" ]
+lint.unfixable = [ "ERA001" ]
+lint.external = [ "NOD" ]
+lint.flake8-tidy-imports.banned-api."operator.attrgetter".msg = "Use an explicitly typed callable."
+lint.flake8-tidy-imports.banned-api."typing.cast".msg = "Use explicit narrowing or a typed variable."
 lint.pydocstyle.convention = "google"
+lint.preview = true
+
+[tool.pylint]
+DEPRECATED_BUILTINS.bad-functions = [ "filter", "getattr", "hasattr", "map", "setattr" ]
+FORMAT.single-line-if-stmt = false
+MAIN.fail-on = [ "useless-suppression" ]
+MASTER.ignore-paths = [ ".*/hackerrank_cli/_version.py" ]
+MASTER.jobs = 2
+MASTER.load-plugins = [
+  "pylint.extensions.bad_builtin",
+  "pylint.extensions.comparison_placement",
+  "pylint.extensions.consider_refactoring_into_while_condition",
+  "pylint.extensions.docparams",
+  "pylint.extensions.dunder",
+  "pylint.extensions.eq_without_hash",
+  "pylint.extensions.for_any_all",
+  "pylint.extensions.mccabe",
+  "pylint.extensions.no_self_use",
+  "pylint.extensions.overlapping_exceptions",
+  "pylint.extensions.private_import",
+  "pylint.extensions.redefined_loop_name",
+  "pylint.extensions.redefined_variable_type",
+  "pylint.extensions.set_membership",
+  "pylint.extensions.typing",
+  "pylint_per_file_ignores",
+]
+MASTER.persistent = true
+MASTER.unsafe-load-any-extension = false
+MESSAGES-CONTROL.disable = [
+  "duplicate-code",
+  "line-too-long",
+  "locally-disabled",
+  "missing-return-type-doc",
+  "missing-type-doc",
+  "too-few-public-methods",
+  "too-many-arguments",
+  "too-many-instance-attributes",
+  "too-many-lines",
+  "too-many-locals",
+  "too-many-public-methods",
+  "too-many-return-statements",
+  "too-many-statements",
+  "ungrouped-imports",
+  "unused-import",
+  "wrong-import-order",
+]
+MESSAGES-CONTROL.enable = [
+  "bad-inline-option",
+  "deprecated-pragma",
+  "file-ignored",
+  "spelling",
+  "use-symbolic-message-instead",
+  "useless-suppression",
+]
+# Tests compare the complete expected sequence, including empty lists.
+MESSAGES-CONTROL.per-file-ignores = [
+  "docs/source/conf.py:invalid-name",
+  "tests/*.py:use-implicit-booleaness-not-comparison"
+]
+SPELLING.spelling-dict = "en_US"
+SPELLING.spelling-private-dict-file = "spelling_private_dict.txt"
+SPELLING.spelling-store-unknown-words = "no"
+
+[tool.interrogate]
+fail-under = 100
+ignore-overloaded-functions = true
+exclude = [ "src/hackerrank_cli/_version.py" ]
+verbose = 2
+omit-covered-files = true
+
+[tool.check-manifest]
+ignore = [ "src/hackerrank_cli/_version.py" ]
+
+[tool.vulture]
+exclude = [ ".venv", "build", "dist", "doccmd_", "src/hackerrank_cli/_version.py" ]
+ignore_names = [
+  "author",
+  "extensions",
+  "html_theme",
+  "html_theme_options",
+  "nitpicky",
+  "project",
+  "release",
+  "spelling_word_list_filename",
+]
 
 [tool.pyproject-fmt]
 keep_full_version = true
@@ -78,12 +192,19 @@ max_supported_python = "3.14"
 [tool.mypy]
 files = [ "bin", "docs/source/conf.py", "src", "tests" ]
 exclude = [ "src/hackerrank_cli/_version.py" ]
+exclude_gitignore = true
+follow_untyped_imports = true
+python_version = "3.13"
 strict = true
+plugins = [ "mypy_strict_kwargs" ]
 
 [tool.pyrefly]
 project-includes = [ "bin", "docs/source/conf.py", "src", "tests" ]
 project-excludes = [ "src/hackerrank_cli/_version.py" ]
 search-path = [ "." ]
+errors.non-exhaustive-match = "error"
+disable-project-excludes-heuristics = true
+enabled-ignores = [ "pyrefly" ]
 preset = "all"
 
 [tool.pyright]
@@ -106,6 +227,8 @@ analysis.strict-generic-narrowing = true
 ini_options.testpaths = [ "tests" ]
 ini_options.addopts = "--cov=hackerrank_cli --cov-branch --cov-fail-under=100"
 ini_options.xfail_strict = true
+ini_options.beartype_test_fixtures = true
+ini_options.beartype_tests = true
 
 [tool.coverage]
 run.omit = [ "src/hackerrank_cli/__main__.py", "src/hackerrank_cli/_version.py" ]
@@ -126,3 +249,18 @@ type = [
 
 [tool.doc8]
 ignore_path = [ ".venv", "docs/build", "build", "src/hackerrank_cli.egg-info" ]
+
+[tool.pydocstringformatter]
+write = true
+split-summary-body = false
+max-line-length = 75
+linewrap-full-docstring = true
+
+[tool.yamlfix]
+section_whitelines = 1
+whitelines = 1
+
+[tool.no_defaults]
+private_only = true
+per_file_enforcement."tests/**" = "all"
+per_file_enforcement."bin/**" = "all"

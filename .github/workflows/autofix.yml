@@ -1,11 +1,15 @@
+---
 name: autofix.ci
+
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
+
 permissions:
   contents: read
+
 jobs:
   autofix:
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@v10.2.0
         with:
-          version: '0.12.19'
+          version: 0.12.19
           python-version: '3.13'
       - name: Run repository fixers and checks
         run: uv run --locked prek run --all-files --stage pre-commit --no-fail-fast

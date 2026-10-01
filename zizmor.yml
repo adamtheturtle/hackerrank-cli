@@ -1,0 +1,8 @@
+---
+rules:
+  # Actions use Dependabot-managed version tags, matching Literalizer.
+  unpinned-uses:
+    disable: true
+  # Keep the existing update schedule and protected-branch auto-merge policy.
+  dependabot-cooldown:
+    disable: true
