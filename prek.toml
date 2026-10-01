@@ -1,0 +1,30 @@
+#:schema https://www.schemastore.org/prek.json
+fail_fast = true
+default_install_hook_types = ["pre-commit", "pre-push"]
+
+[[repos]]
+repo = "https://github.com/pre-commit/pre-commit-hooks"
+rev = "v6.0.0"
+hooks = [
+  {id = "check-added-large-files"},
+  {id = "check-merge-conflict"},
+  {id = "check-toml"},
+  {id = "check-yaml"},
+  {id = "end-of-file-fixer"},
+  {id = "trailing-whitespace"},
+]
+
+[[repos]]
+repo = "local"
+hooks = [
+  {id = "ruff", name = "Ruff strict lint", entry = "uv run --locked ruff check", language = "system", types = ["python"]},
+  {id = "ruff-format", name = "Ruff format", entry = "uv run --locked ruff format --check", language = "system", types = ["python"]},
+  {id = "pyproject-fmt", name = "pyproject-fmt", entry = "uv run --locked pyproject-fmt --check", language = "system", files = "^pyproject\\.toml$"},
+  {id = "doc8", name = "doc8", entry = "uv run --locked doc8", language = "system", types = ["rst"]},
+  {id = "sphinx-lint", name = "sphinx-lint", entry = "uv run --locked sphinx-lint", language = "system", types = ["rst"]},
+  {id = "actionlint", name = "actionlint", entry = "uv run --locked actionlint", language = "system", pass_filenames = false, files = "^\\.github/workflows/"},
+  {id = "mypy", name = "Mypy strict", entry = "uv run --locked mypy", language = "system", pass_filenames = false, always_run = true, stages = ["pre-push"]},
+  {id = "pyright", name = "Pyright strict", entry = "uv run --locked pyright", language = "system", pass_filenames = false, always_run = true, stages = ["pre-push"]},
+  {id = "pyrefly", name = "Pyrefly all", entry = "uv run --locked pyrefly check", language = "system", pass_filenames = false, always_run = true, stages = ["pre-push"]},
+  {id = "ty", name = "ty all", entry = "uv run --locked ty check", language = "system", pass_filenames = false, always_run = true, stages = ["pre-push"]},
+]

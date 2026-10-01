@@ -1,0 +1,127 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=77", "setuptools-scm>=8.1" ]
+
+[project]
+name = "hackerrank-cli"
+description = "Upload starter files to existing HackerRank project questions."
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = "MIT"
+authors = [ { name = "Adam Dangoor", email = "adamdangoor@gmail.com" } ]
+requires-python = ">=3.13"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dynamic = [ "version" ]
+dependencies = [ "click>=8.3,<8.6", "hackerrank>=2026.9.16", "httpx>=0.28", "httpx2>=2.12", "pathspec>=1" ]
+urls.Issues = "https://github.com/adamtheturtle/hackerrank-cli/issues"
+urls.Source = "https://github.com/adamtheturtle/hackerrank-cli"
+scripts.hackerrank = "hackerrank_cli:main"
+
+[dependency-groups]
+dev = [
+  "actionlint-py==1.7.12.25",
+  "build==1.6.1",
+  "check-wheel-contents==0.6.3",
+  "doc8==2",
+  "furo==2025.12.19",
+  "mypy==2.3.1",
+  "prek==0.5.4",
+  "pyproject-fmt==2.29.4",
+  "pyrefly==1.3.1",
+  "pyright==1.1.414",
+  "pytest==9.1.1",
+  "pytest-cov==7.1",
+  "respx==0.23.1",
+  "ruff==0.16.9",
+  "sphinx>=8.1.3",
+  "sphinx-click==6.2",
+  "sphinx-lint==1.0.2",
+  "towncrier==26.9",
+  "twine==7.0.0",
+  "ty==0.0.84",
+]
+binary = [ "pyinstaller>=6.12" ]
+
+[tool.setuptools]
+packages.find.where = [ "src" ]
+package-data.hackerrank_cli = [ "py.typed" ]
+zip-safe = false
+
+[tool.setuptools_scm]
+version_file = "src/hackerrank_cli/_version.py"
+version_scheme = "post-release"
+
+[tool.ruff]
+line-length = 79
+extend-exclude = [ "src/hackerrank_cli/_version.py" ]
+lint.select = [ "ALL" ]
+lint.ignore = [
+  "COM812", # Conflicts with the formatter.
+  "CPY001", # License is in LICENSE.
+  "D203",
+  "D213",   # Use Google docstring convention.
+]
+lint.per-file-ignores."tests/*.py" = [ "S101" ]
+lint.pydocstyle.convention = "google"
+
+[tool.pyproject-fmt]
+keep_full_version = true
+max_supported_python = "3.14"
+
+[tool.mypy]
+files = [ "bin", "docs/source/conf.py", "src", "tests" ]
+exclude = [ "src/hackerrank_cli/_version.py" ]
+strict = true
+
+[tool.pyrefly]
+project-includes = [ "bin", "docs/source/conf.py", "src", "tests" ]
+project-excludes = [ "src/hackerrank_cli/_version.py" ]
+search-path = [ "." ]
+preset = "all"
+
+[tool.pyright]
+typeCheckingMode = "strict"
+include = [ "bin", "docs/source/conf.py", "src", "tests" ]
+exclude = [ "src/hackerrank_cli/_version.py" ]
+enableTypeIgnoreComments = false
+reportUnnecessaryTypeIgnoreComment = true
+
+[tool.ty]
+src.include = [ "bin", "docs/source/conf.py", "src", "tests" ]
+src.exclude = [ "src/hackerrank_cli/_version.py" ]
+rules.all = "error"
+terminal.error-on-warning = true
+analysis.respect-type-ignore-comments = false
+analysis.strict-equality-semantics = true
+analysis.strict-generic-narrowing = true
+
+[tool.pytest]
+ini_options.testpaths = [ "tests" ]
+ini_options.addopts = "--cov=hackerrank_cli --cov-branch --cov-fail-under=100"
+ini_options.xfail_strict = true
+
+[tool.coverage]
+run.omit = [ "src/hackerrank_cli/__main__.py", "src/hackerrank_cli/_version.py" ]
+run.branch = true
+report.show_missing = true
+
+[tool.towncrier]
+directory = "newsfragments"
+filename = "CHANGELOG.rst"
+title_format = "{version} ({project_date})"
+issue_format = "#{issue}"
+underlines = [ "-", "~", "^" ]
+ignore = [ ".gitkeep" ]
+type = [
+  { directory = "feature", name = "Features", showcontent = true },
+  { directory = "bugfix", name = "Bug fixes", showcontent = true },
+]
+
+[tool.doc8]
+ignore_path = [ ".venv", "docs/build", "build", "src/hackerrank_cli.egg-info" ]

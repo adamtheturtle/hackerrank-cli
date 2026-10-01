@@ -1,0 +1,4 @@
+include LICENSE README.rst CHANGELOG.rst
+recursive-include src *.py *.typed
+recursive-include docs *.rst *.py
+recursive-include newsfragments *

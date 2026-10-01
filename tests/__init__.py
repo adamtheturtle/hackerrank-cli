@@ -1,0 +1,1 @@
+"""Synthetic CLI tests."""

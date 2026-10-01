@@ -1,0 +1,31 @@
+name: Deploy documentation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: '0.12.19'
+          python-version: '3.13'
+      - run: uv run --locked sphinx-build -W --keep-going -b html docs/source docs/build/html
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs/build/html
+      - id: deployment
+        uses: actions/deploy-pages@v5

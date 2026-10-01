@@ -1,0 +1,134 @@
+name: Standalone binaries
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      notarize:
+        description: Sign and notarize the macOS artifact without publishing a release
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      notarize:
+        description: Require Developer ID signing and notarization for macOS releases
+        type: boolean
+        default: false
+    secrets:
+      DEVELOPER_ID_APP_CERT_P12_BASE64:
+        required: false
+      DEVELOPER_ID_APP_CERT_PASSWORD:
+        required: false
+      APPLE_ID:
+        required: false
+      APPLE_TEAM_ID:
+        required: false
+      APPLE_APP_PASSWORD:
+        required: false
+permissions:
+  contents: read
+jobs:
+  binary:
+    if: ${{ !inputs.notarize || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/20') }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: hackerrank-linux
+          - os: macos-latest
+            name: hackerrank-macos
+          - os: windows-latest
+            name: hackerrank-windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          version: '0.12.19'
+          python-version: '3.13'
+      - name: Require release credentials
+        if: runner.os == 'macOS' && inputs.notarize
+        env:
+          CERTIFICATE: ${{ secrets.DEVELOPER_ID_APP_CERT_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPER_ID_APP_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          : "${CERTIFICATE:?Missing DEVELOPER_ID_APP_CERT_P12_BASE64}"
+          : "${CERTIFICATE_PASSWORD:?Missing DEVELOPER_ID_APP_CERT_PASSWORD}"
+          : "${APPLE_ID:?Missing APPLE_ID}" "${APPLE_TEAM_ID:?Missing APPLE_TEAM_ID}" "${APPLE_APP_PASSWORD:?Missing APPLE_APP_PASSWORD}"
+      # The action removes its temporary keychain in its post step.
+      - name: Import the Developer ID certificate
+        if: runner.os == 'macOS' && inputs.notarize
+        uses: Apple-Actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466 # v7.0.0
+        with:
+          p12-file-base64: ${{ secrets.DEVELOPER_ID_APP_CERT_P12_BASE64 }}
+          p12-password: ${{ secrets.DEVELOPER_ID_APP_CERT_PASSWORD }}
+      - name: Build binary
+        shell: bash
+        env:
+          NAME: ${{ matrix.name }}
+          NOTARIZE: ${{ inputs.notarize }}
+        run: |
+          signing=()
+          if [ "$RUNNER_OS" = macOS ] && [ "$NOTARIZE" = true ]; then
+            # Sign embedded libraries before packing the one-file archive.
+            # PyInstaller enables the hardened runtime and secure timestamp.
+            signing=(--codesign-identity "Developer ID Application")
+          fi
+          uv run --locked --group binary pyinstaller --clean --onefile --copy-metadata hackerrank-cli --name "$NAME" "${signing[@]}" bin/hackerrank_wrapper.py
+      - name: Verify Developer ID signature
+        if: runner.os == 'macOS' && inputs.notarize
+        run: codesign --verify --strict --verbose=2 dist/hackerrank-macos
+      - name: Smoke binary
+        shell: bash
+        env:
+          NAME: ${{ matrix.name }}
+        run: |
+          executable="dist/$NAME"
+          if [ "$RUNNER_OS" = Windows ]; then executable="$executable.exe"; fi
+          "$executable" --help
+          "$executable" --version
+          "$executable" questions upload --help
+      - name: Notarize macOS binary
+        if: runner.os == 'macOS' && inputs.notarize
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          archive="$RUNNER_TEMP/hackerrank-macos.zip"
+          result="$RUNNER_TEMP/notarization.json"
+          ditto -c -k --sequesterRsrc dist/hackerrank-macos "$archive"
+          xcrun notarytool submit "$archive" \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+            --wait --timeout 30m --output-format json > "$result" || true
+          cat "$result"
+          # A rejected submission can still return exit status zero.
+          if ! jq -e '.status == "Accepted"' "$result" > /dev/null; then
+            submission_id=$(jq -r '.id // empty' "$result")
+            if [ -n "$submission_id" ]; then
+              xcrun notarytool log "$submission_id" \
+                --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" || true
+            fi
+            exit 1
+          fi
+      # A bare Mach-O cannot be stapled. Verify the online ticket, allowing
+      # time for Apple's service to propagate it after acceptance.
+      - name: Verify notarization ticket
+        if: runner.os == 'macOS' && inputs.notarize
+        uses: nick-fields/retry@v4
+        with:
+          timeout_seconds: 60
+          max_attempts: 10
+          retry_wait_seconds: 30
+          command: codesign -vvvv -R="notarized" --check-notarization dist/hackerrank-macos
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.name }}
+          path: dist/hackerrank-*
