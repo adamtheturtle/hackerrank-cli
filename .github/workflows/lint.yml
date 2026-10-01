@@ -6,15 +6,23 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: 0 1 * * *
 
 permissions:
   contents: read
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.os == 'ubuntu-latest' && 'lint' || 'lint-windows' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt-get update && sudo apt-get install --yes libenchant-2-2 hunspell-en-us
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install --yes libenchant-2-2 hunspell-en-us
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -24,6 +32,6 @@ jobs:
           version: 0.12.19
           python-version: '3.13'
           enable-cache: true
-      - run: uv run --locked prek run --all-files
-      - run: uv run --locked prek run --all-files --stage pre-push
-      - run: uv run --locked prek run --all-files --stage manual --group pylint
+      - run: uv run --locked prek run --all-files --no-fail-fast
+      - run: uv run --locked prek run --all-files --no-fail-fast --stage pre-push
+      - run: uv run --locked prek run --all-files --no-fail-fast --stage manual

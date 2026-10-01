@@ -1,0 +1,10 @@
+Usage: hackerrank [OPTIONS] COMMAND [ARGS]...
+
+  Upload starter files to existing HackerRank project questions.
+
+Options:
+  --version  Show the version and exit.
+  --help     Show this message and exit.
+
+Commands:
+  questions  Manage project-question starter files.
