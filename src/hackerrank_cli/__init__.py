@@ -21,16 +21,18 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
 
     @click.group(name="hackerrank")
     @click.version_option(
-        version=version("hackerrank-cli"), prog_name="hackerrank"
+        version=version(distribution_name="hackerrank-cli"),
+        prog_name="hackerrank",
     )
     def cli() -> None:
-        """Upload starter files to existing HackerRank project questions."""
+        """Upload starter files to existing HackerRank project
+        questions.
+        """
 
     @cli.group()
     def questions() -> None:
         """Manage project-question starter files."""
 
-    @questions.command()
     @click.argument("question_id")
     @click.option(
         "--directory",
@@ -69,17 +71,20 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         *,
         dry_run: bool,
     ) -> None:
-        """Replace project starter files while preserving question metadata."""
+        """Replace project starter files while preserving question
+        metadata.
+        """
         _upload(
-            question_id,
-            directory,
-            source_file,
-            exclude,
-            retries,
+            question_id=question_id,
+            directory=directory,
+            source_file=source_file,
+            exclude=exclude,
+            retries=retries,
             dry_run=dry_run,
             transport=transport,
         )
 
+    _ = questions.command()(upload)
     return cli
 
 
@@ -92,43 +97,50 @@ def _validate_upload(
     """Validate command combinations and the question identifier."""
     if (directory is None) == (source_file is None):
         msg = "Provide exactly one of --directory or --file."
-        raise click.UsageError(msg)
+        raise click.UsageError(message=msg)
     if (
         not question_id.isascii()
         or not question_id.isdecimal()
         or int(question_id) < 1
     ):
         msg = "QUESTION_ID must be a positive decimal integer."
-        raise click.BadParameter(msg, param_hint="QUESTION_ID")
+        raise click.BadParameter(message=msg, param_hint="QUESTION_ID")
     if len(exclude) > 0 and directory is None:
         msg = "--exclude requires --directory."
-        raise click.UsageError(msg)
+        raise click.UsageError(message=msg)
 
 
 def _api_key() -> str:
     """Read a nonempty API token without printing its value."""
-    api_key = os.environ.get("HACKERRANK_API_TOKEN")
+    api_key = os.environ.get(key="HACKERRANK_API_TOKEN")
     if api_key is None or api_key.strip() == "":
         msg = (
             "HACKERRANK_API_TOKEN is missing or empty. "
             "Set it in the environment."
         )
-        raise click.ClickException(msg)
+        raise click.ClickException(message=msg)
     return api_key
 
 
 def _project_zip(source: PreparedSource) -> bytes:
     """Package prepared starter files for the released SDK's ZIP API."""
     with BytesIO() as buffer:
-        with ZipFile(buffer, mode="w", compression=ZIP_DEFLATED) as archive:
+        with ZipFile(
+            file=buffer, mode="w", compression=ZIP_DEFLATED
+        ) as archive:
             if source.directory is None:
-                info = ZipInfo(Path(source.files[0]).name)
+                info = ZipInfo(filename=Path(source.files[0]).name)
                 info.external_attr = source.file_mode << 16
-                info.compress_type = ZIP_DEFLATED
-                archive.writestr(info, source.contents)
+                archive.writestr(
+                    zinfo_or_arcname=info,
+                    data=source.contents,
+                    compress_type=ZIP_DEFLATED,
+                )
             else:
                 for name in source.files:
-                    archive.write(source.directory / name, arcname=name)
+                    archive.write(
+                        filename=source.directory / name, arcname=name
+                    )
         return buffer.getvalue()
 
 
@@ -138,7 +150,9 @@ def _send_upload(
     retries: int,
     transport: Transport | None,
 ) -> None:
-    """Delegate communication and retries to the SDK; report safe errors."""
+    """Delegate communication and retries to the SDK; report safe
+    errors.
+    """
     api_key = _api_key()
     try:
         with HackerRank(
@@ -150,16 +164,16 @@ def _send_upload(
     except HackerRankError as error:
         # Response bodies can contain secrets; only report the status.
         msg = f"HackerRank rejected the upload (HTTP {error.status_code})."
-        raise click.ClickException(msg) from None
+        raise click.ClickException(message=msg) from None
     except (httpx.TransportError, httpx2.TransportError):
         msg = "Could not reach HackerRank. Check your network connection."
-        raise click.ClickException(msg) from None
+        raise click.ClickException(message=msg) from None
     except (ValueError, TypeError):
         msg = (
             "HackerRank returned an invalid response. The upload may have "
             "succeeded; check the question before trying again."
         )
-        raise click.ClickException(msg) from None
+        raise click.ClickException(message=msg) from None
 
 
 def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
@@ -173,28 +187,38 @@ def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
     transport: Transport | None,
 ) -> None:
     """Prepare every byte before credentials or a network mutation."""
-    _validate_upload(question_id, directory, source_file, exclude)
+    _validate_upload(
+        question_id=question_id,
+        directory=directory,
+        source_file=source_file,
+        exclude=exclude,
+    )
     try:
         with prepare_source(
             directory=directory, file=source_file, excludes=exclude
         ) as source:
-            archive = _project_zip(source)
+            archive = _project_zip(source=source)
             target = f"HackerRank project question {question_id}"
             if dry_run:
-                click.echo(f"Would update {target}")
+                click.echo(message=f"Would update {target}")
                 for path in source.files:
-                    click.echo(f"  {path}")
+                    click.echo(message=f"  {path}")
                 return
-            _send_upload(question_id, archive, retries, transport)
-            click.echo(f"Updated {target}")
+            _send_upload(
+                question_id=question_id,
+                archive=archive,
+                retries=retries,
+                transport=transport,
+            )
+            click.echo(message=f"Updated {target}")
     except UnicodeError:
         msg = ".gitignore files must be valid UTF-8."
-        raise click.ClickException(msg) from None
+        raise click.ClickException(message=msg) from None
     except OSError as error:
         msg = f"Could not prepare upload files ({type(error).__name__})."
-        raise click.ClickException(msg) from None
+        raise click.ClickException(message=msg) from None
     except ValueError as error:
-        raise click.ClickException(str(error)) from None
+        raise click.ClickException(message=str(object=error)) from None
 
 
-main = create_cli()
+main: click.Group = create_cli()

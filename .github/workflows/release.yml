@@ -1,9 +1,13 @@
+---
 name: Release
+
 on:
   push:
-    tags: ['20*']
+    tags: [20*]
+
 permissions:
   contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -14,7 +18,7 @@ jobs:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v10.2.0
         with:
-          version: '0.12.19'
+          version: 0.12.19
           python-version: '3.13'
       - run: uv run --locked pytest
       - run: uv run --locked prek run --all-files
@@ -28,7 +32,8 @@ jobs:
           name: distributions
           path: dist/*
   binaries:
-    uses: ./.github/workflows/binaries.yml
+    # actionlint 1.7.12 accepts ./ for local workflows and rejects $/.
+    uses: ./.github/workflows/binaries.yml  # zizmor: ignore[self-repository]
     with:
       notarize: true
     secrets:
@@ -65,7 +70,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
-        run: gh release create "$TAG" artifacts/distributions/* artifacts/hackerrank-*/* --title "$TAG" --notes-file CHANGELOG.rst --verify-tag
+        run: gh release create "$TAG" artifacts/distributions/* artifacts/hackerrank-*/*
+          --title "$TAG" --notes-file CHANGELOG.rst --verify-tag
   docker:
     needs: publish
     runs-on: ubuntu-latest

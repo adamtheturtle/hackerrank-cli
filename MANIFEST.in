@@ -2,3 +2,11 @@ include LICENSE README.rst CHANGELOG.rst
 recursive-include src *.py *.typed
 recursive-include docs *.rst *.py
 recursive-include newsfragments *
+include .vale.ini prek.toml spelling_private_dict.txt zizmor.yml
+recursive-include styles/snapper *.yml
+include .github/dependabot.yml
+recursive-include .github/workflows *.yml
+include Dockerfile flake.nix flake.lock uv.lock
+recursive-include bin *.py
+recursive-include tests *.py
+include .dockerignore

@@ -1,23 +1,29 @@
+---
 name: Lint
+
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt-get update && sudo apt-get install --yes libenchant-2-2 hunspell-en-us
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v10.2.0
         with:
-          version: '0.12.19'
+          version: 0.12.19
           python-version: '3.13'
           enable-cache: true
       - run: uv run --locked prek run --all-files
       - run: uv run --locked prek run --all-files --stage pre-push
+      - run: uv run --locked prek run --all-files --stage manual --group pylint
