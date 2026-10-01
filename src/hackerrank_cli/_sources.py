@@ -11,9 +11,12 @@ from tempfile import TemporaryDirectory
 from pathspec import GitIgnoreSpec
 
 
-def reject_symlinks(path: Path) -> None:
+def validate_path(path: Path) -> None:
     """Reject symlinks in the path and its ancestors before resolving it."""
     for component in (path, *path.parents):
+        if component.name.casefold() == ".git":
+            msg = f"Git metadata cannot be uploaded: {component}"
+            raise ValueError(msg)
         if component.is_symlink():
             msg = f"Symbolic links are not supported: {component}"
             raise ValueError(msg)
@@ -23,7 +26,7 @@ def _rules(directory: Path) -> tuple[tuple[Path, GitIgnoreSpec], ...]:
     """Read one directory's ignore rules without following symlinks."""
     ignore_file = directory / ".gitignore"
     if ignore_file.is_symlink():
-        reject_symlinks(ignore_file)
+        validate_path(ignore_file)
     if ignore_file.is_file():
         return (
             (
@@ -95,7 +98,7 @@ def selected_files(
                 continue
             if _is_ignored(path, rules, suffix=suffix):
                 continue
-            reject_symlinks(path)
+            validate_path(path)
             if is_directory:
                 yield from walk(path, (*rules, *_rules(path)))
             else:
@@ -124,7 +127,7 @@ def prepare_source(
 ) -> Generator[PreparedSource]:
     """Read or stage everything before allowing a network mutation."""
     if file is not None:
-        reject_symlinks(file.absolute())
+        validate_path(file.absolute())
         if not file.is_file():
             msg = f"Not a regular file: {file}"
             raise ValueError(msg)
@@ -135,7 +138,7 @@ def prepare_source(
     if directory is None:
         msg = "Provide exactly one of --directory or --file."
         raise ValueError(msg)
-    reject_symlinks(directory.absolute())
+    validate_path(directory.absolute())
     directory = directory.resolve(strict=True)
     if not directory.is_dir():
         msg = f"Not a directory: {directory}"
@@ -149,13 +152,13 @@ def prepare_source(
         staged.mkdir()
         for relative in files:
             source = directory / relative
-            reject_symlinks(source)
+            validate_path(source)
             target = staged / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             # Never dereference a symlink introduced after selection.
             # Validate the copied path before packaging its bytes.
             _ = copyfile(source, target, follow_symlinks=False)
-            reject_symlinks(target)
+            validate_path(target)
             copymode(source, target, follow_symlinks=False)
         yield PreparedSource(
             b"", staged, tuple(path.as_posix() for path in files), 0

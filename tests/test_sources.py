@@ -220,3 +220,31 @@ def test_executable_mode_preserved(mode: str, tmp_path: Path) -> None:
             == expected_mode
         )
         assert archive.read("start.sh") == b"#!/bin/sh\nexit 0\n"
+
+
+@pytest.mark.parametrize("marker", [".git", ".GIT"])
+@pytest.mark.parametrize("mode", ["directory", "file"])
+def test_explicit_git_metadata_rejected(
+    marker: str, mode: str, tmp_path: Path
+) -> None:
+    """An explicit source cannot bypass the Git metadata exclusion."""
+    metadata = tmp_path / marker
+    metadata.mkdir()
+    source = metadata / "config"
+    _ = source.write_text("synthetic private configuration")
+    path = metadata if mode == "directory" else source
+    transport = RecordingTransport()
+    result = CliRunner().invoke(
+        create_cli(transport=transport),
+        [
+            "questions",
+            "upload",
+            "123456",
+            f"--{mode}",
+            str(path),
+            "--dry-run",
+        ],
+    )
+    assert result.exit_code == 1
+    assert "Git metadata cannot be uploaded" in result.output
+    assert transport.requests == []

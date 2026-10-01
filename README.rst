@@ -72,6 +72,8 @@ Directory selection
   ``.git/info/exclude`` are not read. Hidden files, including ``.gitignore``,
   are uploaded unless excluded.
 * ``.git`` files and directories are always excluded at every depth.
+  Explicit source paths inside Git metadata are rejected, including an
+  upload rooted at a ``.git`` directory.
   Repeatable ``--exclude PATTERN`` options form a final Gitignore rule layer,
   relative to the upload root. This layer can exclude files re-included by
   ``.gitignore``; its own later negations can undo its earlier patterns.
