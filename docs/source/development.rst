@@ -78,8 +78,8 @@ upload:
 The Nix flake uses uv2nix and the committed lockfiles.
 Its build injects an SCM version because Git metadata is unavailable in Nix
 source snapshots.
-Ordinary macOS CI builds use PyInstaller's ad-hoc signature and do not use
-Apple credentials.
+The standalone-binary workflow runs for releases and manual builds.
+Unsigned macOS builds use PyInstaller's ad-hoc signature.
 Distribution signing and notarization are required by the release workflow.
 See :doc:`macos-releases` for signing, notarization, and credential setup.
 
@@ -105,9 +105,9 @@ External setup
   configuration has been created.
   Do not advertise those installation paths until they exist.
 
-The default branch already requires 16 Actions checks: tests on Python 3.13 and
-3.14 across Linux, macOS, and Windows, lint, documentation, packaging, two Nix
-builds, three standalone binaries, and autofix.
+The default branch requires 13 Actions checks: tests on Python 3.13 and 3.14
+across Linux, macOS, and Windows, lint on Linux and Windows, documentation,
+packaging, two Nix builds, and autofix.
 The public repository's tests and builds do not need a HackerRank token.
 
 Quality checks
