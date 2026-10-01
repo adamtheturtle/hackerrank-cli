@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from importlib.metadata import version
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 import click
@@ -105,7 +104,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
     )
     @click.option(
         "--output",
-        type=click.File(mode="xb", lazy=True),
+        type=click.Path(dir_okay=False, allow_dash=True),
         required=True,
         help=(
             "New ZIP file, or - for binary standard output. "
@@ -116,7 +115,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         directory: Path | None,
         source_file: Path | None,
         exclude: tuple[str, ...],
-        output: BinaryIO,
+        output: str,
     ) -> None:
         """Export a project ZIP without credentials or network access."""
         _validate_source(
@@ -129,7 +128,8 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
             ) as source,
         ):
             contents = _project_zip(source=source)
-            _ = output.write(contents)
+            with click.open_file(filename=output, mode="xb") as destination:
+                _ = destination.write(contents)
 
     _ = questions.command()(archive)
     _ = questions.command()(upload)

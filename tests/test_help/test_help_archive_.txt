@@ -3,11 +3,9 @@ Usage: hackerrank questions archive [OPTIONS]
   Export a project ZIP without credentials or network access.
 
 Options:
-  --directory PATH   Project directory.
-  --file PATH        One starter file, packaged as a single-file project
-                     archive.
-  --exclude TEXT     Additional Gitignore pattern at the upload root.
-                     Repeatable.
-  --output FILENAME  New ZIP file, or - for binary standard output. Never
-                     overwrites files.  [required]
-  --help             Show this message and exit.
+  --directory PATH  Project directory.
+  --file PATH       One starter file, packaged as a single-file project archive.
+  --exclude TEXT    Additional Gitignore pattern at the upload root. Repeatable.
+  --output FILE     New ZIP file, or - for binary standard output. Never
+                    overwrites files.  [required]
+  --help            Show this message and exit.
