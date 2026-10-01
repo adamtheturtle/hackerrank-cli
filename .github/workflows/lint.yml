@@ -16,6 +16,7 @@ jobs:
   lint:
     name: ${{ matrix.os == 'ubuntu-latest' && 'lint' || 'lint-windows' }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
@@ -31,6 +32,6 @@ jobs:
           version: 0.12.19
           python-version: '3.13'
           enable-cache: true
-      - run: uv run --locked prek run --all-files
-      - run: uv run --locked prek run --all-files --stage pre-push
-      - run: uv run --locked prek run --all-files --stage manual
+      - run: uv run --locked prek run --all-files --no-fail-fast
+      - run: uv run --locked prek run --all-files --no-fail-fast --stage pre-push
+      - run: uv run --locked prek run --all-files --no-fail-fast --stage manual
