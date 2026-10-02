@@ -221,7 +221,7 @@ hooks = [
     stages = ["pre-push"],
     groups = ["typecheck"],
     priority = 520,
-    entry = "uv run --locked --group=dev -m mypy",
+    entry = "uv run --locked --group=dev -m mypy --num-workers=auto",
     language = "system",
     types_or = [
       "python",
