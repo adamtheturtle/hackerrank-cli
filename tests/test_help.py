@@ -12,8 +12,13 @@ from hackerrank_cli import main
 
 @pytest.mark.parametrize(
     argnames="arguments",
-    argvalues=[[], ["questions"], ["questions", "upload"]],
-    ids=["root", "questions", "upload"],
+    argvalues=[
+        [],
+        ["questions"],
+        ["questions", "upload"],
+        ["questions", "archive"],
+    ],
+    ids=["root", "questions", "upload", "archive"],
 )
 def test_help(
     arguments: list[str], file_regression: FileRegressionFixture
