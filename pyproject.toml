@@ -226,15 +226,17 @@ analysis.strict-generic-narrowing = true
 
 [tool.pytest]
 ini_options.testpaths = [ "tests" ]
-ini_options.addopts = "-n auto --cov=hackerrank_cli --cov-branch --cov-fail-under=100"
+ini_options.addopts = "-n auto --cov --cov-config=pyproject.toml"
 ini_options.xfail_strict = true
 ini_options.beartype_packages = [ "hackerrank_cli" ]
 ini_options.beartype_test_fixtures = true
 ini_options.beartype_tests = true
 
 [tool.coverage]
+run.source = [ "hackerrank_cli" ]
 run.omit = [ "src/hackerrank_cli/__main__.py", "src/hackerrank_cli/_version.py" ]
 run.branch = true
+report.fail_under = 100
 report.show_missing = true
 
 [tool.towncrier]
