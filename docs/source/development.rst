@@ -43,9 +43,8 @@ No separate mock-spec repository is needed for this scope.
 Add a Towncrier feature or bugfix fragment for each user-visible change.
 
 Versions derive from Git tags using setuptools-scm.
-Untagged initial builds have a development version.
-Use date-based tags such as ``2026.10.02`` for releases; no release tag is
-created as part of repository initialization.
+Untagged builds have a development version.
+Use date-based tags such as ``2026.10.7`` for releases.
 Before tagging a release, assemble notes with
 ``uv run towncrier build --yes --version VERSION``, commit the changelog, then
 write the same version to ``VERSION``, commit it, then tag the commit.

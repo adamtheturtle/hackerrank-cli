@@ -1,2 +1,0 @@
-Export project ZIP archives offline with ``hackerrank questions archive``,
-using the same file selection and packaging as uploads.

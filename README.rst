@@ -12,8 +12,14 @@ projects.
 Language-specific coding-question stubs are outside this CLI's initial scope.
 
 Requires Python 3.13 or later.
-No package release has been published yet.
-Install the checkout for now:
+Install from PyPI:
+
+.. code-block:: console
+
+   uv tool install hackerrank-cli
+   hackerrank --help
+
+Or install the checkout for development:
 
 .. code-block:: console
 
@@ -21,8 +27,7 @@ Install the checkout for now:
    uv run hackerrank --help
    uv run python -m hackerrank_cli --version
 
-After the first PyPI release, install with ``uv tool install hackerrank-cli``
-or ``pip install hackerrank-cli``.
+``pip install hackerrank-cli`` is also supported.
 
 Usage
 -----
