@@ -1,6 +1,6 @@
-include LICENSE README.rst CHANGELOG.rst
+include LICENSE README.rst
 recursive-include src *.py *.typed
-recursive-include docs *.rst *.py
+recursive-include docs *.rst *.md *.py
 recursive-include newsfragments *
 include .vale.ini prek.toml spelling_private_dict.txt zizmor.yml
 recursive-include styles/snapper *.yml

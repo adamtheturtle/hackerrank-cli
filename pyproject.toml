@@ -40,6 +40,7 @@ dev = [
   "mypy==2.4.0",
   "mypy-pytest-parametrize==2026.10.5",
   "mypy-strict-kwargs==2026.8.25.1",
+  "myst-parser==5.1.0",
   "no-defaults==2026.9.1",
   "prek==0.5.4",
   "pydocstringformatter==1.0.0",
@@ -241,10 +242,10 @@ report.show_missing = true
 
 [tool.towncrier]
 directory = "newsfragments"
-filename = "CHANGELOG.rst"
-title_format = "{version} ({project_date})"
-issue_format = "#{issue}"
-underlines = [ "-", "~", "^" ]
+filename = "docs/source/changelog/{version}.md"
+title_format = "# {version} ({project_date})"
+issue_format = "[#{issue}](https://github.com/adamtheturtle/hackerrank-cli/issues/{issue})"
+single_file = false
 ignore = [ ".gitkeep" ]
 type = [
   { directory = "feature", name = "Features", showcontent = true },
