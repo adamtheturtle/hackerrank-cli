@@ -11,3 +11,5 @@ recursive-include bin *.py
 recursive-include tests *.py *.txt
 include .dockerignore
 include .gitattributes
+
+include VERSION
