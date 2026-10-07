@@ -40,17 +40,26 @@ The upload tests so assert the released SDK's actual wire behavior instead of
 inventing an OpenAPI schema.
 No separate mock-spec repository is needed for this scope.
 
-Add a Towncrier feature or bugfix fragment for each user-visible change.
+Add a Towncrier feature or bugfix fragment in Markdown for each user-visible
+change, such as ``newsfragments/123.bugfix.md``.
 
 Versions derive from Git tags using setuptools-scm.
 Untagged builds have a development version.
 Use date-based tags such as ``2026.10.7`` for releases.
 Before tagging a release, assemble notes with
-``uv run towncrier build --yes --version VERSION``, commit the changelog, then
-write the same version to ``VERSION``, commit it, then tag the commit.
+``uv run towncrier build --yes --version VERSION``, commit the generated notes
+in ``docs/source/changelog/VERSION.md``, then write the same version to
+``VERSION``, commit it, then tag the commit.
 Pushing a tag is the explicit publication trigger.
 The release workflow builds and checks packages, builds three standalone
 binaries, and then publishes to PyPI, GitHub Releases, and GHCR.
+
+Towncrier writes a separate Markdown file for each release.
+Sphinx reads those files through MyST and lists them in the changelog.
+The release workflow uploads the tagged version's file directly as its GitHub
+release notes.
+Pull requests check that the notes for ``VERSION`` exist.
+Review the generated Markdown before pushing a release tag.
 
 Local builds
 ------------

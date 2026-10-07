@@ -44,6 +44,10 @@ jobs:
       - run: uv build
       - run: uv run --locked twine check dist/*
       - run: uv run --locked check-wheel-contents dist/*.whl
+      - name: Check release notes exist
+        run: |
+          RELEASE_VERSION="$(cat VERSION)"
+          test -s "docs/source/changelog/$RELEASE_VERSION.md"
       - name: Smoke installed wheel
         run: |
           uv venv /tmp/hackerrank-wheel
