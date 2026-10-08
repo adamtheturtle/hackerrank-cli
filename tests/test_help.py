@@ -18,7 +18,7 @@ from hackerrank_cli import main
         ["questions", "upload"],
         ["questions", "archive"],
     ],
-    ids=["root", "questions", "upload", "archive"],
+    ids=lambda arguments: "-".join(arguments) or "root",
 )
 def test_help(
     arguments: list[str], file_regression: FileRegressionFixture
