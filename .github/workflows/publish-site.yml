@@ -25,7 +25,7 @@ jobs:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v10.2.0
         with:
-          version: 0.12.19
+          version: 0.13.0
           python-version: '3.13'
       - run: uv run --locked sphinx-build -W --keep-going -b html docs/source docs/build/html
       - uses: actions/configure-pages@v6

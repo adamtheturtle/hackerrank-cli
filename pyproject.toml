@@ -88,7 +88,7 @@ version_file = "src/hackerrank_cli/_version.py"
 version_scheme = "post-release"
 
 [tool.uv]
-required-version = "==0.12.19"
+required-version = "==0.13.0"
 
 [tool.ruff]
 line-length = 79
