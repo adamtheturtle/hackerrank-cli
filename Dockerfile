@@ -1,6 +1,6 @@
 FROM python:3.13-slim AS build
 LABEL org.opencontainers.image.source="https://github.com/adamtheturtle/hackerrank-cli"
-COPY --from=ghcr.io/astral-sh/uv:0.12.19 /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /bin/uv
 WORKDIR /build
 COPY . .
 ARG HACKERRANK_CLI_VERSION=0.0.0
