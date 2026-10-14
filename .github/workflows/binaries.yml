@@ -65,8 +65,9 @@ jobs:
           : "${APPLE_ID:?Missing APPLE_ID}" "${APPLE_TEAM_ID:?Missing APPLE_TEAM_ID}" "${APPLE_APP_PASSWORD:?Missing APPLE_APP_PASSWORD}"
       # The action removes its temporary keychain in its post step.
       - name: Import the Developer ID certificate
+        id: signing_certificate
         if: runner.os == 'macOS' && inputs.notarize
-        uses: Apple-Actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466  # v7.0.0
+        uses: Apple-Actions/import-codesign-certs@77ba2a2a8f5cfc8c405ebf3159f767c323e238f9  # v7.1.0
         with:
           p12-file-base64: ${{ secrets.DEVELOPER_ID_APP_CERT_P12_BASE64 }}
           p12-password: ${{ secrets.DEVELOPER_ID_APP_CERT_PASSWORD }}
@@ -75,12 +76,19 @@ jobs:
         env:
           NAME: ${{ matrix.name }}
           NOTARIZE: ${{ inputs.notarize }}
+          IDENTITIES: ${{ steps.signing_certificate.outputs.identities }}
         run: |
           signing=()
           if [ "$RUNNER_OS" = macOS ] && [ "$NOTARIZE" = true ]; then
             # Sign embedded libraries before packing the one-file archive.
             # PyInstaller enables the hardened runtime and secure timestamp.
-            signing=(--codesign-identity "Developer ID Application")
+            signing_identity="$(jq -er '
+              [.[] | select(.name | startswith("Developer ID Application:"))]
+              | if length == 1 then .[0].hash
+                else error("Expected exactly one Developer ID Application identity; found \(length)")
+                end
+            ' <<< "$IDENTITIES")"
+            signing=(--codesign-identity "$signing_identity")
           fi
           uv run --locked --group binary pyinstaller --clean --onefile --copy-metadata hackerrank-cli --name "$NAME" "${signing[@]}" bin/hackerrank_wrapper.py
       - name: Verify Developer ID signature
