@@ -88,7 +88,8 @@ version_file = "src/hackerrank_cli/_version.py"
 version_scheme = "post-release"
 
 [tool.uv]
-required-version = "==0.13.0"
+# Dependabot currently ships uv 0.12.18; CI pins uv separately.
+required-version = ">=0.12.18"
 
 [tool.ruff]
 line-length = 79
