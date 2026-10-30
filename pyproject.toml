@@ -57,7 +57,7 @@ dev = [
   "pytest-regressions==2.11.0",
   "pytest-xdist==3.8.0",
   "respx==0.23.1",
-  "ruff==0.17.2",
+  "ruff==0.17.3",
   "setuptools>=77",
   "setuptools-scm>=8.1",
   "shellcheck-py==0.11.0.1",
