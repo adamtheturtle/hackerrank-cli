@@ -1,0 +1,9 @@
+Usage: hackerrank questions set-system-prompt [OPTIONS] QUESTION_ID
+
+  Set the AI system prompt on an existing project question.
+
+Options:
+  --prompt-file FILE  UTF-8 system prompt, up to 15,000 characters. An empty
+                      file clears it.  [required]
+  --dry-run           Validate the prompt without credentials or network access.
+  --help              Show this message and exit.

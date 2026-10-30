@@ -1,10 +1,11 @@
 Usage: hackerrank questions [OPTIONS] COMMAND [ARGS]...
 
-  Manage project-question starter files.
+  Manage project-question starter files and AI prompts.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  archive  Export a project ZIP without credentials or network access.
-  upload   Replace project starter files while preserving question metadata.
+  archive            Export a project ZIP without credentials or network...
+  set-system-prompt  Set the AI system prompt on an existing project question.
+  upload             Replace project starter files while preserving...

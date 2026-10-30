@@ -17,6 +17,7 @@ from hackerrank_cli import main
         ["questions"],
         ["questions", "upload"],
         ["questions", "archive"],
+        ["questions", "set-system-prompt"],
     ],
     ids=lambda arguments: "-".join(arguments) or "root",
 )

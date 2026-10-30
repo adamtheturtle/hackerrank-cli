@@ -7,4 +7,4 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  questions  Manage project-question starter files.
+  questions  Manage project-question starter files and AI prompts.
