@@ -230,7 +230,9 @@ def _set_system_prompt(
 def _write_system_prompt(
     *, client: HackerRank, question_id: str, prompt: str
 ) -> None:
-    """Read existing metadata before replacing a project's system prompt."""
+    """Read existing metadata before replacing a project's system
+    prompt.
+    """
     current = client.questions.get(question_id=question_id)
     if current.type != "fullstack":
         msg = "System prompts are supported for project (fullstack) questions."
