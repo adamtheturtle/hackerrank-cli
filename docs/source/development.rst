@@ -6,13 +6,13 @@ This standalone repository follows ``coderpad-cli`` main at
 It adapts the src layout, Click entry points, setuptools-scm versions, uv
 lockfile, strict checks, 100% branch coverage, Sphinx, Towncrier, and
 distribution workflows.
-The SDK baseline is the released ``hackerrank==2026.9.16`` in ``uv.lock``.
+The SDK baseline is the released ``hackerrank==2026.10.30`` in ``uv.lock``.
 Python 3.13 or later is required by the SDK.
 
 The released SDK exposes ``questions.upload_project_zip``.
-Its newer ``upload_project_directory`` helper is not yet released.
 This CLI prepares filtered ZIPs with the standard library and uses the public
 released SDK for multipart serialization and all API communication.
+Project AI prompt updates use the SDK's question read and update methods.
 It does not import private SDK helpers or install an unreleased Git dependency.
 
 .. code-block:: shell
@@ -30,9 +30,9 @@ Tests use the real SDK with its public ``Transport`` interface and default
 HTTPX transport.
 No SDK methods are replaced and no live questions are mutated.
 RESPX intercepts the HTTP boundary and fails closed for unregistered requests.
-Tests inspect the actual multipart body and ZIP bytes, assert the absence of
-metadata updates, preserve text, binary contents and executable bits, and
-exercise SDK retries with immutable archive bytes.
+Upload tests inspect the actual multipart body and ZIP bytes, assert the
+absence of metadata updates, preserve text, binary contents and executable
+bits, and exercise SDK retries with immutable archive bytes.
 
 The SDK's checked-in Swagger specification does not describe the
 ``upload_project_zip`` endpoint.

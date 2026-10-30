@@ -142,3 +142,18 @@ There are no prebuilt artifacts yet.
 
 See ``docs/source/migration.rst`` for migrating an existing shell uploader and
 keeping repository-specific snippet preparation outside this CLI.
+
+Project AI system prompts
+-------------------------
+
+Set an existing project question's AI assistant prompt from a UTF-8 file:
+
+.. code-block:: console
+
+   $ hackerrank questions set-system-prompt 123456 --prompt-file prompt.txt
+
+Use ``--dry-run`` to validate without credentials or network access.
+Prompts may contain up to 15,000 characters.
+Text is sent exactly as read, including whitespace and line endings.
+An empty file explicitly clears the prompt.
+The command reads the question first to preserve its other metadata.
