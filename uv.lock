@@ -747,7 +747,7 @@ wheels = [
 
 [[package]]
 name = "hackerrank"
-version = "2026.11.2"
+version = "2026.11.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beartype" },
@@ -755,9 +755,9 @@ dependencies = [
     { name = "httpx2" },
     { name = "tenacity" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e8/be/ee10117b771c9da485a6cdee2d6bfaa7ba655457a2be52b6ad2ba15efcdc/hackerrank-2026.11.2.tar.gz", hash = "sha256:33ef7a2b9b286ed793744c8a07a31f7b41e30235c77df2847fe793b94bf152e7", size = 143631, upload-time = "2026-11-02T11:06:47.237Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d8/95/ac7595d7dd09d08a7cc3f2411dc53db996c7f079001880914310bc7560a6/hackerrank-2026.11.3.1.tar.gz", hash = "sha256:215d57335276e1ec68b1adcdfe782c5ab5cb03b2d2e9c80319d87adf3dda9ccb", size = 142955, upload-time = "2026-11-03T16:35:23.857Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/33/a4f1c4382942b3c1b49e3671049daeea0fa5c1be9de0cce68b95a32c8327/hackerrank-2026.11.2-py3-none-any.whl", hash = "sha256:e738d132e1b0c51f0a88193412ee7cb4027faa5406f914e576a1716c33316b76", size = 52843, upload-time = "2026-11-02T11:06:45.717Z" },
+    { url = "https://files.pythonhosted.org/packages/fe/ac/43670d8f473b832d9212117c4eacc744638f9e04a71d6da382ce76c9cd1e/hackerrank-2026.11.3.1-py3-none-any.whl", hash = "sha256:5dbd8e818a690777693389b1fcc4b4ffbd13214dd5eed900448f0802863a2613", size = 52218, upload-time = "2026-11-03T16:35:22.581Z" },
 ]
 
 [[package]]
