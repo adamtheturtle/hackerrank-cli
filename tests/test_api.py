@@ -2,7 +2,7 @@
 transport.
 """
 
-import json
+import json as jsonlib
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -90,9 +90,9 @@ def test_every_documented_operation_is_runnable(
             "call",
             operation.id,
             "--path",
-            json.dumps(obj=path),
+            jsonlib.dumps(obj=path),
             "--query",
-            json.dumps(obj=query),
+            jsonlib.dumps(obj=query),
         ]
         if operation.body_required:
             args.extend(["--body-file", str(object=body)])
@@ -110,7 +110,7 @@ def test_every_documented_operation_is_runnable(
             if operation.scim
             else "Bearer v3-synthetic"
         )
-        assert json.loads(s=result.output)["data"] == {"ok": True}
+        assert jsonlib.loads(s=result.output)["data"] == {"ok": True}
 
 
 def test_catalogue_help_and_schema_need_no_credentials() -> None:
@@ -120,14 +120,15 @@ def test_catalogue_help_and_schema_need_no_credentials() -> None:
         cli=cli, args=["api", "operations"], catch_exceptions=False
     )
     assert {
-        value["operation"] for value in json.loads(s=listed.output)
+        value["operation"] for value in jsonlib.loads(s=listed.output)
     } == set(api_operations())
     described = CliRunner().invoke(
         cli=cli,
         args=["api", "describe", "api_create_user"],
         catch_exceptions=False,
     )
-    assert json.loads(s=described.output)["operation"]["body_required"] is True
+    description = jsonlib.loads(s=described.output)
+    assert description["operation"]["body_required"] is True
     invalid = CliRunner().invoke(cli=cli, args=["api", "describe", "missing"])
     assert invalid.exit_code != 0
     for args in [
@@ -195,7 +196,7 @@ def test_dry_run_and_stdin_body(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     assert saved.exit_code == 0
     assert transport.requests[-1][4] == {"content": "  line\r\n"}
-    assert json.loads(s=saved.output)["data"] is None
+    assert jsonlib.loads(s=saved.output)["data"] is None
     invalid = CliRunner().invoke(cli=cli, args=args, input="broken")
     assert invalid.exit_code != 0
 
