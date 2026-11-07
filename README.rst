@@ -181,6 +181,4 @@ Dry runs validate requests before reading credentials and make no API calls.
 Responses include status, headers and complete JSON data, including empty and
 pending responses.
 
-This branch temporarily pins the SDK commit from
-`hackerrank PR 515 <https://github.com/adamtheturtle/hackerrank/pull/515>`_.
-Replace the revision with a released dependency after the SDK is released.
+The complete API commands require ``hackerrank>=2026.11.7``.
