@@ -52,6 +52,19 @@
         else
           "0.0.0+${self.shortRev or self.dirtyShortRev or "unknown"}";
 
+      # The pinned SDK is built from source, so supply its build backend.
+      hackerrankSourceOverlay = final: prev: {
+        hackerrank = prev.hackerrank.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem {
+            setuptools = [ ];
+            setuptools-scm = [ ];
+          };
+          env = (old.env or { }) // {
+            SETUPTOOLS_SCM_PRETEND_VERSION = old.version;
+          };
+        });
+      };
+
       # Override hackerrank-cli to set the version
       hackerrankCliOverlay = final: prev: {
         hackerrank-cli = prev.hackerrank-cli.overrideAttrs (old: {
@@ -74,6 +87,7 @@
             lib.composeManyExtensions [
               pyproject-build-systems.overlays.wheel
               overlay
+              hackerrankSourceOverlay
               hackerrankCliOverlay
             ]
           )
