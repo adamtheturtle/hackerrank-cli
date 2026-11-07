@@ -10,12 +10,69 @@ from typing import BinaryIO, override
 
 import httpx
 import pytest
+import respx
 from click.testing import CliRunner
 from hackerrank.api import api_operations
 from hackerrank.transports import Transport, TransportResponse
 from hackerrank.types import JSONValue
 
 from hackerrank_cli import create_cli
+
+
+def test_template_list_and_selected_detail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Default SDK transport preserves template identity and full JSON."""
+    monkeypatch.setenv(name="HACKERRANK_API_TOKEN", value="synthetic")
+    base = "https://www.hackerrank.com/x/api/v3/interview_templates"
+    templates = [
+        {"id": "101", "name": "First", "questions": [201]},
+        {"id": "102", "name": "Selected", "questions": [202, 203]},
+    ]
+    page = {
+        "data": templates,
+        "next": f"{base}?offset=2&limit=2",
+        "total": 3,
+        "page_total": 2,
+        "offset": 0,
+        "extra": {"preserved": True},
+    }
+    cli = create_cli(transport=None)
+    with respx.mock(assert_all_called=True) as router:
+        _ = router.get(url=base, params={"limit": "2"}).respond(
+            status_code=200, json=page
+        )
+        _ = router.get(url=f"{base}/102").respond(
+            status_code=200, json=templates[1]
+        )
+        listed = CliRunner().invoke(
+            cli=cli,
+            args=[
+                "api",
+                "call",
+                "api_list_all_interview_templates",
+                "--query",
+                '{"limit":2}',
+            ],
+            catch_exceptions=False,
+        )
+        assert listed.exit_code == 0
+        data = jsonlib.loads(s=listed.output)["data"]
+        assert data == page
+        selected_id = data["data"][1]["id"]
+        shown = CliRunner().invoke(
+            cli=cli,
+            args=[
+                "api",
+                "call",
+                "api_show_interview_template",
+                "--path",
+                jsonlib.dumps(obj={"template_id": selected_id}),
+            ],
+            catch_exceptions=False,
+        )
+    assert shown.exit_code == 0
+    assert jsonlib.loads(s=shown.output)["data"] == templates[1]
 
 
 @dataclass
