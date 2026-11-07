@@ -157,3 +157,30 @@ Prompts may contain up to 15,000 characters.
 Text is sent exactly as read, including whitespace and line endings.
 An empty file explicitly clears the prompt.
 The command reads the question first to preserve its other metadata.
+
+Complete API access
+-------------------
+
+The ``api`` command group exposes all 76 documented v3, ATS and SCIM
+operations.
+Use ``hackerrank api operations`` to list names and ``api describe OPERATION``
+to inspect parameters and body schemas.
+
+.. code-block:: console
+
+   hackerrank api call api_list_all_tests --query '{"limit": 10}'
+   hackerrank api call api_update_interviewer_note --path '{"interview_id": "123"}' --body-file note.json --dry-run
+
+``--path`` and ``--query`` accept JSON objects.
+``--body-file`` reads a JSON object from a UTF-8 file, or stdin when set to
+``-``.
+Real v3 requests use ``HACKERRANK_API_TOKEN``.
+SCIM requests use their own ``HACKERRANK_SCIM_API_TOKEN`` and provisioning
+host.
+Dry runs validate requests before reading credentials and make no API calls.
+Responses include status, headers and complete JSON data, including empty and
+pending responses.
+
+This branch temporarily pins the SDK commit from
+`hackerrank PR 515 <https://github.com/adamtheturtle/hackerrank/pull/515>`_.
+Replace the revision with a released dependency after the SDK is released.
