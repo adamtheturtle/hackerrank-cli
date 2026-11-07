@@ -15,6 +15,7 @@ from hackerrank.client import HackerRank
 from hackerrank.exceptions import HackerRankError
 from hackerrank.transports import Transport
 
+from hackerrank_cli._api import create_api_cli
 from hackerrank_cli._sources import PreparedSource, prepare_source
 
 
@@ -27,9 +28,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         prog_name="hackerrank",
     )
     def cli() -> None:
-        """Upload starter files to existing HackerRank project
-        questions.
-        """
+        """Manage HackerRank uploads, prompts and the complete API."""
 
     @cli.group()
     def questions() -> None:
@@ -162,6 +161,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
     _ = questions.command()(set_system_prompt)
     _ = questions.command()(archive)
     _ = questions.command()(upload)
+    cli.add_command(cmd=create_api_cli(transport=transport))
     return cli
 
 

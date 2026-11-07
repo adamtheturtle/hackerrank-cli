@@ -1,10 +1,11 @@
 Usage: hackerrank [OPTIONS] COMMAND [ARGS]...
 
-  Upload starter files to existing HackerRank project questions.
+  Manage HackerRank uploads, prompts and the complete API.
 
 Options:
   --version  Show the version and exit.
   --help     Show this message and exit.
 
 Commands:
+  api        Call every documented v3, ATS and SCIM operation.
   questions  Manage project-question starter files and AI prompts.
