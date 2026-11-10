@@ -38,7 +38,9 @@ def test_prompt_update_preserves_metadata(tmp_path: Path, prompt: str) -> None:
     _ = prompt_file.write_bytes(data=prompt.encode(encoding="utf-8"))
     with respx.mock(assert_all_called=True) as router:
         _ = router.get(url=_BASE).respond(status_code=200, json=_QUESTION)
-        update = router.put(url=_BASE).respond(status_code=200, json=_QUESTION)
+        update = router.put(url=_BASE + "/").respond(
+            status_code=200, json=_QUESTION
+        )
         result = CliRunner().invoke(
             cli=main,
             args=[
@@ -156,7 +158,7 @@ def test_prompt_errors_omit_secrets(tmp_path: Path, status: int) -> None:
     _ = prompt_file.write_text(data="Hints", encoding="utf-8")
     with respx.mock(assert_all_called=True) as router:
         _ = router.get(url=_BASE).respond(status_code=200, json=_QUESTION)
-        update = router.put(url=_BASE).respond(
+        update = router.put(url=_BASE + "/").respond(
             status_code=status, json={"error": "synthetic-secret"}
         )
         result = CliRunner().invoke(
@@ -234,16 +236,31 @@ def test_prompt_request_failure(tmp_path: Path, failure: str) -> None:
         assert route.call_count == 1
 
 
-def test_sparse_question_metadata(tmp_path: Path) -> None:
-    """Optional metadata can be absent from the read without breaking an
-    update.
+@pytest.mark.parametrize(
+    argnames="missing",
+    argvalues=[None, "problem_statement", "recommended_duration"],
+)
+def test_sparse_question_metadata(tmp_path: Path, missing: str | None) -> None:
+    """Require a statement and duration while preserving absent optional
+    data.
     """
     prompt_file = tmp_path / "prompt.txt"
     _ = prompt_file.write_text(data="Hints", encoding="utf-8")
-    question = {"id": "123456", "type": "fullstack", "name": "Project"}
+    question: dict[str, JSONValue] = {
+        "id": "123456",
+        "type": "fullstack",
+        "name": "Project",
+        "problem_statement": "Keep",
+        "recommended_duration": 0,
+        "answer": "0",
+    }
+    if missing is not None:
+        del question[missing]
     with respx.mock(assert_all_called=True) as router:
-        _ = router.get(url=_BASE).respond(status_code=200, json=question)
-        update = router.put(url=_BASE).respond(status_code=200, json=question)
+        get = router.get(url=_BASE).respond(status_code=200, json=question)
+        update: respx.Route | None = None
+        if missing is None:
+            update = router.put(url=_BASE + "/").respond(status_code=204)
         result = CliRunner().invoke(
             cli=main,
             args=[
@@ -255,18 +272,24 @@ def test_sparse_question_metadata(tmp_path: Path) -> None:
             ],
             env={"HACKERRANK_API_TOKEN": "synthetic-secret"},
         )
-        assert result.exit_code == 0, result.output
-        call: object = update.calls.last
-        assert isinstance(call, respx.models.Call)
-        assert json.loads(s=call.request.content) == {
-            "name": "Project",
-            "type": "fullstack",
-            "internal_notes": "",
-            "problem_statement": "",
-            "recommended_duration": 0,
-            "languages": [],
-            "tags": [],
-            "options": [],
-            "answer": [],
-            "custom_system_prompt": "Hints",
-        }
+        if missing is not None:
+            assert result.exit_code == 1
+            assert "invalid response" in result.output
+            assert get.call_count == len(router.calls)
+        else:
+            assert result.exit_code == 0, result.output
+            assert update is not None
+            call: object = update.calls.last
+            assert isinstance(call, respx.models.Call)
+            assert json.loads(s=call.request.content) == {
+                "name": "Project",
+                "type": "fullstack",
+                "internal_notes": "",
+                "problem_statement": "Keep",
+                "recommended_duration": 0,
+                "languages": [],
+                "tags": [],
+                "options": [],
+                "answer": "0",
+                "custom_system_prompt": "Hints",
+            }

@@ -14,9 +14,16 @@ import httpx2
 from hackerrank.client import HackerRank
 from hackerrank.exceptions import HackerRankError
 from hackerrank.transports import Transport
+from hackerrank.types import QuestionChanges
 
 from hackerrank_cli._api import create_api_cli
-from hackerrank_cli._sources import PreparedSource, prepare_source
+from hackerrank_cli._sources import (
+    PreparedSource,
+    prepare_source,
+    require_regular_file,
+    validate_path,
+)
+from hackerrank_cli.projects import configure_project_archive
 
 
 def create_cli(*, transport: Transport | None = None) -> click.Group:
@@ -47,6 +54,14 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         help="One starter file, uploaded as a single-file project archive.",
     )
     @click.option(
+        "--configuration-file",
+        type=click.Path(path_type=Path, exists=True, dir_okay=False),
+        help=(
+            "Native project configuration to add or replace "
+            "at the archive root."
+        ),
+    )
+    @click.option(
         "--exclude",
         multiple=True,
         help="Additional Gitignore pattern at the upload root. Repeatable.",
@@ -70,6 +85,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         exclude: tuple[str, ...],
         retries: int,
         *,
+        configuration_file: Path | None,
         dry_run: bool,
     ) -> None:
         """Replace project starter files while preserving question
@@ -79,6 +95,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
             question_id=question_id,
             directory=directory,
             source_file=source_file,
+            configuration_file=configuration_file,
             exclude=exclude,
             retries=retries,
             dry_run=dry_run,
@@ -97,6 +114,14 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         help="One starter file, packaged as a single-file project archive.",
     )
     @click.option(
+        "--configuration-file",
+        type=click.Path(path_type=Path, exists=True, dir_okay=False),
+        help=(
+            "Native project configuration to add or replace "
+            "at the archive root."
+        ),
+    )
+    @click.option(
         "--exclude",
         multiple=True,
         help="Additional Gitignore pattern at the upload root. Repeatable.",
@@ -113,6 +138,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
     def archive(
         directory: Path | None,
         source_file: Path | None,
+        configuration_file: Path | None,
         exclude: tuple[str, ...],
         output: str,
     ) -> None:
@@ -126,7 +152,10 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
                 directory=directory, file=source_file, excludes=exclude
             ) as source,
         ):
-            contents = _project_zip(source=source)
+            contents = _project_zip(
+                source=source,
+                configuration=_read_configuration(file=configuration_file),
+            )
             with click.open_file(filename=output, mode="xb") as destination:
                 _ = destination.write(contents)
 
@@ -237,24 +266,9 @@ def _write_system_prompt(
     if not current.supports_custom_system_prompt:
         msg = "System prompts are supported for project (fullstack) questions."
         raise click.ClickException(message=msg)
-    _ = client.questions.update(
+    _ = client.questions.update_metadata(
         question_id=question_id,
-        name=current.name,
-        type=current.type,
-        internal_notes=""
-        if current.internal_notes is None
-        else current.internal_notes,
-        languages=[] if current.languages is None else current.languages,
-        problem_statement=""
-        if current.problem_statement is None
-        else current.problem_statement,
-        recommended_duration=0
-        if current.recommended_duration is None
-        else current.recommended_duration,
-        tags=[] if current.tags is None else current.tags,
-        options=[] if current.options is None else current.options,
-        answer=[] if current.answer is None else current.answer,
-        custom_system_prompt=prompt,
+        changes=QuestionChanges(custom_system_prompt=prompt),
     )
 
 
@@ -284,7 +298,18 @@ def _api_key() -> str:
     return api_key
 
 
-def _project_zip(source: PreparedSource) -> bytes:
+def _read_configuration(*, file: Path | None) -> bytes | None:
+    """Read an optional native configuration before any network call."""
+    if file is None:
+        return None
+    validate_path(path=file.absolute())
+    require_regular_file(path=file)
+    return file.read_bytes()
+
+
+def _project_zip(
+    *, source: PreparedSource, configuration: bytes | None
+) -> bytes:
     """Package prepared starter files for the released SDK's ZIP API."""
     with BytesIO() as buffer:
         with ZipFile(
@@ -303,7 +328,12 @@ def _project_zip(source: PreparedSource) -> bytes:
                     archive.write(
                         filename=source.directory / name, arcname=name
                     )
-        return buffer.getvalue()
+        contents = buffer.getvalue()
+    if configuration is None:
+        return contents
+    return configure_project_archive(
+        archive=contents, configuration=configuration
+    )
 
 
 def _send_upload(
@@ -339,12 +369,13 @@ def _send_upload(
 
 
 def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
+    *,
     question_id: str,
     directory: Path | None,
     source_file: Path | None,
+    configuration_file: Path | None,
     exclude: tuple[str, ...],
     retries: int,
-    *,
     dry_run: bool,
     transport: Transport | None,
 ) -> None:
@@ -367,12 +398,20 @@ def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
             directory=directory, file=source_file, excludes=exclude
         ) as source,
     ):
-        archive = _project_zip(source=source)
+        archive = _project_zip(
+            source=source,
+            configuration=_read_configuration(file=configuration_file),
+        )
         target = f"HackerRank project question {question_id}"
         if dry_run:
             click.echo(message=f"Would update {target}")
-            for path in source.files:
-                click.echo(message=f"  {path}")
+            for name in source.files:
+                click.echo(message=f"  {name}")
+            if (
+                configuration_file is not None
+                and "hackerrank.yml" not in source.files
+            ):
+                click.echo(message="  hackerrank.yml")
             return
         _send_upload(
             question_id=question_id,

@@ -88,6 +88,53 @@ match ``questions upload``.
 Consumers can extract this archive for local checks, then send its bytes with
 the SDK's ``questions.upload_project_zip`` method.
 
+Native project configuration
+----------------------------
+
+Both ``questions archive`` and ``questions upload`` accept
+``--configuration-file ./native.yml``.
+The file must contain a UTF-8 native HackerRank document with ``version: 1.0``
+and a ``configuration`` mapping.
+Its bytes replace the root ``hackerrank.yml`` entry or add it if absent.
+Other files and their executable permissions are preserved.
+Dry runs validate the configuration and include ``hackerrank.yml`` in the file
+listing without credentials or network requests.
+
+Python callers can render explicit values and configure a prepared ZIP:
+
+.. code-block:: python
+
+   """Add native configuration to a prepared project archive."""
+
+   from pathlib import Path
+
+   from hackerrank_cli.projects import (
+       ProjectConfiguration,
+       configure_project_archive,
+   )
+
+   configuration = ProjectConfiguration(
+       has_webserver=False,
+       readonly_paths=[],
+       scoring_command="python3 -m pytest",
+       scoring_files=[],
+       default_open_files=["solution.py"],
+       project_menu={
+           "install": "python3 -m pip install -r requirements.txt",
+           "run": "python3 solution.py",
+           "test": "python3 -m pytest",
+       },
+   )
+   configured_zip = configure_project_archive(
+       archive=Path("starter.zip").read_bytes(),
+       configuration=configuration.to_yaml(),
+   )
+
+All configuration values are required in the typed helper.
+Callers choose their own commands, defaults, and file-selection rules.
+Existing native files may include additional configuration keys.
+Invalid YAML, invalid ZIPs, and duplicate archive names fail before writing.
+
 Directory selection
 -------------------
 
@@ -156,7 +203,8 @@ Use ``--dry-run`` to validate without credentials or network access.
 Prompts may contain up to 15,000 characters.
 Text is sent exactly as read, including whitespace and line endings.
 An empty file explicitly clears the prompt.
-The command reads the question first to preserve its other metadata.
+The command uses the SDK metadata helper to preserve other question fields.
+A missing problem statement or duration fails before the update.
 
 Complete API access
 -------------------

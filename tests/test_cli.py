@@ -178,7 +178,7 @@ def test_exact_file_and_metadata(contents: str, tmp_path: Path) -> None:
     [(method, url, json, files)] = transport.requests
     assert (method, url, json) == (
         "POST",
-        "https://www.hackerrank.com/x/api/v3/questions/123456/upload_project_zip",
+        "https://www.hackerrank.com/x/api/v3/questions/123456/upload_project_zip/",
         None,
     )
     assert files is not None
@@ -287,7 +287,7 @@ def test_directory_zip_and_metadata(tmp_path: Path) -> None:
     [(method, url, data, files)] = transport.requests
     assert (method, url, data) == (
         "POST",
-        "https://www.hackerrank.com/x/api/v3/questions/123456/upload_project_zip",
+        "https://www.hackerrank.com/x/api/v3/questions/123456/upload_project_zip/",
         None,
     )
     assert files is not None
