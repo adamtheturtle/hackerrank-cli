@@ -22,7 +22,7 @@ _TWO_ATTEMPTS = 2
 _THREE_ATTEMPTS = 3
 
 _URL = (
-    "https://www.hackerrank.com/x/api/v3/questions/123456/upload_project_zip"
+    "https://www.hackerrank.com/x/api/v3/questions/123456/upload_project_zip/"
 )
 
 
@@ -347,6 +347,9 @@ def test_network_retry_over_httpx(tmp_path: Path) -> None:
         return httpx.Response(status_code=HTTPStatus.OK, json={})
 
     with respx.mock(assert_all_mocked=True) as router:
+        _ = router.get(
+            url="https://www.hackerrank.com/x/api/v3/questions/123456"
+        ).respond(status_code=404)
         route = router.post(url=_URL).mock(side_effect=upload)
         result = CliRunner().invoke(
             cli=main,
@@ -375,6 +378,9 @@ def test_timeout_over_default_httpx(tmp_path: Path) -> None:
     source = tmp_path / "starter.py"
     _ = source.write_text(data="pass")
     with respx.mock(assert_all_mocked=True) as router:
+        _ = router.get(
+            url="https://www.hackerrank.com/x/api/v3/questions/123456"
+        ).respond(status_code=404)
         route = router.post(url=_URL).mock(
             side_effect=httpx.ReadTimeout(message="synthetic-secret")
         )

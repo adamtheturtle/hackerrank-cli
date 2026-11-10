@@ -23,10 +23,11 @@ classifiers = [
 dynamic = [ "version" ]
 dependencies = [
   "click>=8.3,<8.6",
-  "hackerrank>=2026.11.10",
+  "hackerrank>=2026.11.10.4",
   "httpx>=0.28",
   "httpx2>=2.12",
   "pathspec>=1",
+  "pyyaml>=6",
 ]
 urls.Documentation = "https://adamtheturtle.github.io/hackerrank-cli/"
 urls.Issues = "https://github.com/adamtheturtle/hackerrank-cli/issues"
@@ -77,6 +78,7 @@ dev = [
   "towncrier==26.9",
   "twine==7.0.0",
   "ty==0.0.99",
+  "types-pyyaml==6.0.12.20261103",
   "vale==3.26.0.1",
   "vulture==2.16",
   "yamlfix==1.19.1",

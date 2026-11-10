@@ -747,7 +747,7 @@ wheels = [
 
 [[package]]
 name = "hackerrank"
-version = "2026.11.10"
+version = "2026.11.10.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beartype" },
@@ -755,9 +755,9 @@ dependencies = [
     { name = "httpx2" },
     { name = "tenacity" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/46/6a/ec0a1c4d283d72dfe587f84473b2473dce601d7d71b4587cddd0b7655a8b/hackerrank-2026.11.10.tar.gz", hash = "sha256:c366c5918aa2449569d8feae3a1217541b4b493d5833477eb77b670a411f6c39", size = 191036, upload-time = "2026-11-10T10:46:17.747Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c4/66/7470f17b80d3cbeae8fe66b181fb966fcec1e2c8e0faf590579390d6786a/hackerrank-2026.11.10.4.tar.gz", hash = "sha256:bbfb66dbab862c7d6610c308fffcb36fc5e4d933f90ccdb62904bfd6d3edf3fe", size = 208135, upload-time = "2026-11-10T17:11:41.826Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/91/57/996b94019748389f5f0a2da82f50af075069084d98d7fe1b7a0738fe0cdc/hackerrank-2026.11.10-py3-none-any.whl", hash = "sha256:643be95c051a4778826c54e25f79a578d03d8473407c2c2c261f0079f0d0f12f", size = 89873, upload-time = "2026-11-10T10:46:16.261Z" },
+    { url = "https://files.pythonhosted.org/packages/4a/1b/8442056aa7d1a8f34ad2b223417024264df95c7774aa3aa5404e6e46de65/hackerrank-2026.11.10.4-py3-none-any.whl", hash = "sha256:d5faadc4f517c71aa1d1468e7493bdcc2e4960b2bc32c63628e05f8153daec4e", size = 96512, upload-time = "2026-11-10T17:11:40.187Z" },
 ]
 
 [[package]]
@@ -769,6 +769,7 @@ dependencies = [
     { name = "httpx" },
     { name = "httpx2" },
     { name = "pathspec" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -818,6 +819,7 @@ dev = [
     { name = "towncrier" },
     { name = "twine" },
     { name = "ty" },
+    { name = "types-pyyaml" },
     { name = "vale" },
     { name = "vulture" },
     { name = "yamlfix" },
@@ -827,10 +829,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3,<8.6" },
-    { name = "hackerrank", specifier = ">=2026.11.10" },
+    { name = "hackerrank", specifier = ">=2026.11.10.4" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "httpx2", specifier = ">=2.12" },
     { name = "pathspec", specifier = ">=1" },
+    { name = "pyyaml", specifier = ">=6" },
 ]
 
 [package.metadata.requires-dev]
@@ -878,6 +881,7 @@ dev = [
     { name = "towncrier", specifier = "==26.9" },
     { name = "twine", specifier = "==7.0.0" },
     { name = "ty", specifier = "==0.0.99" },
+    { name = "types-pyyaml", specifier = "==6.0.12.20261103" },
     { name = "vale", specifier = "==3.26.0.1" },
     { name = "vulture", specifier = "==2.16" },
     { name = "yamlfix", specifier = "==1.19.1" },
@@ -2749,6 +2753,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/03/51/d33db42cc72ffd8c30777547b42d01f0cbf9d95a770457698d0174b3ed71/typer-0.27.3.tar.gz", hash = "sha256:d0396f770a560ab1b0a8504e13b5f254b728cedb05c61cf0359e944e50ce8901", size = 205303, upload-time = "2026-10-06T17:24:16.61Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/ea/2e31b67051e91a133189e9c000c222502ddc6969856416de0d095de4c0b0/typer-0.27.3-py3-none-any.whl", hash = "sha256:e50022f28b82a86313e54501317a1db64bf8f8d036ff8cfe5ca7e47675454aff", size = 123312, upload-time = "2026-10-06T17:24:15.054Z" },
+]
+
+[[package]]
+name = "types-pyyaml"
+version = "6.0.12.20261103"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/82/2ed4d215a2840b467a9a864f03b0d21904250e28f5e1f006ad36fba0311a/types_pyyaml-6.0.12.20261103.tar.gz", hash = "sha256:7a1b5f837881dd35d5448b5f18275164f89f206185e31e8eae6e0b42607bc001", size = 18911, upload-time = "2026-11-03T08:45:23.714Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/10/4353eb86278f6a59aeb9fe2be4d979c20b110b4009fa455a3ea6467cf5cb/types_pyyaml-6.0.12.20261103-py3-none-any.whl", hash = "sha256:444654c61f635dab82c092a511aa96a0ce31164810784b9a37314e3e56532ac8", size = 21299, upload-time = "2026-11-03T08:45:22.749Z" },
 ]
 
 [[package]]
