@@ -6,13 +6,15 @@ This standalone repository follows ``coderpad-cli`` main at
 It adapts the src layout, Click entry points, setuptools-scm versions, uv
 lockfile, strict checks, 100% branch coverage, Sphinx, Towncrier, and
 distribution workflows.
-The SDK baseline is the released ``hackerrank==2026.11.7`` in ``uv.lock``.
+The SDK baseline is the released ``hackerrank==2026.11.10`` in ``uv.lock``.
 Python 3.13 or later is required by the SDK.
 
 The released SDK exposes ``questions.upload_project_zip``.
 This CLI prepares filtered ZIPs with the standard library and uses the public
 released SDK for multipart serialization and all API communication.
 Project AI prompt updates use the SDK's question read and update methods.
+The SDK determines which question types support prompts and validates generic
+question writes before credentials or network requests are needed.
 It does not import private SDK helpers or install an unreleased Git dependency.
 
 .. code-block:: shell

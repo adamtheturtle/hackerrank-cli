@@ -113,6 +113,47 @@ def test_every_documented_operation_is_runnable(
         assert jsonlib.loads(s=result.output)["data"] == {"ok": True}
 
 
+@pytest.mark.parametrize(argnames="dry_run", argvalues=[False, True])
+@pytest.mark.parametrize(
+    argnames="operation",
+    argvalues=["api_create_question", "api_update_question"],
+)
+def test_question_prompt_validation_precedes_credentials(
+    *, tmp_path: Path, dry_run: bool, operation: str
+) -> None:
+    """The SDK rejects unsupported prompt updates before any API call."""
+    body = tmp_path / "body.json"
+    _ = body.write_text(
+        data=jsonlib.dumps(
+            obj={"type": "code", "custom_system_prompt": "Hints"}
+        ),
+        encoding="utf-8",
+    )
+    transport = APITransport(
+        status=200, content=b"{}", fail=False, requests=[]
+    )
+    arguments = [
+        "api",
+        "call",
+        operation,
+        "--path",
+        '{"question_id":"1"}',
+        "--body-file",
+        str(object=body),
+    ]
+    if dry_run:
+        arguments.append("--dry-run")
+    result = CliRunner().invoke(
+        cli=create_cli(transport=transport),
+        args=arguments,
+        env={"HACKERRANK_API_TOKEN": ""},
+        catch_exceptions=False,
+    )
+    assert result.exit_code != 0
+    assert "not supported" in result.output
+    assert transport.requests == []
+
+
 def test_catalogue_help_and_schema_need_no_credentials() -> None:
     """Expose discoverable names and complete request schemas offline."""
     cli = create_cli(transport=None)

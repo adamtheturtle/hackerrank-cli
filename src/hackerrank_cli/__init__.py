@@ -234,7 +234,7 @@ def _write_system_prompt(
     prompt.
     """
     current = client.questions.get(question_id=question_id)
-    if current.type != "fullstack":
+    if not current.supports_custom_system_prompt:
         msg = "System prompts are supported for project (fullstack) questions."
         raise click.ClickException(message=msg)
     _ = client.questions.update(
