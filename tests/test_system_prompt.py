@@ -119,13 +119,19 @@ def test_prompt_dry_run(tmp_path: Path) -> None:
         assert len(router.calls) == 0
 
 
-def test_nonproject_question_is_not_updated(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    argnames="question_type",
+    argvalues=["code", "whiteboard", "mcq", "future_type"],
+)
+def test_nonproject_question_is_not_updated(
+    tmp_path: Path, question_type: str
+) -> None:
     """Other question types must not be mutated."""
     prompt_file = tmp_path / "prompt.txt"
     _ = prompt_file.write_text(data="Hints", encoding="utf-8")
     with respx.mock(assert_all_mocked=True) as router:
         _ = router.get(url=_BASE).respond(
-            status_code=200, json={**_QUESTION, "type": "code"}
+            status_code=200, json={**_QUESTION, "type": question_type}
         )
         result = CliRunner().invoke(
             cli=main,
