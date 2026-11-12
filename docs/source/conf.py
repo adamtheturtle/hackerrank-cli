@@ -4,7 +4,7 @@ import importlib.metadata
 
 project = "hackerrank-cli"
 author = "Adam Dangoor"
-release = importlib.metadata.version(distribution_name="hackerrank-cli")
+release: str = importlib.metadata.version(distribution_name="hackerrank-cli")
 extensions = ["myst_parser", "sphinx_click.ext", "sphinxcontrib.spelling"]
 html_theme = "furo"
 nitpicky = True

@@ -342,6 +342,21 @@ hooks = [
 
   },
   {
+    id = "pyrefly-coverage",
+    name = "pyrefly coverage",
+    stages = ["pre-push"],
+    groups = ["typecheck"],
+    priority = 520,
+    entry = "uv run --locked --group=dev pyrefly coverage check --strict --fail-under 100",
+    language = "system",
+    types_or = [
+      "python",
+      "toml"
+    ],
+    pass_filenames = false
+
+  },
+  {
     id = "pyrefly-docs",
     name = "pyrefly-docs",
     stages = ["pre-push"],
