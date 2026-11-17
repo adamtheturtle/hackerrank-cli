@@ -143,8 +143,8 @@ Directory selection
   A Git worktree's ``.git`` file also identifies its root.
 * In a Git repository, rules are inherited from the nearest Git root down to
   the upload directory.
-  Outside Git, rules start at the upload directory; unrelated parent
-  ``.gitignore`` files are not used.
+  Outside Git, rules start at the upload directory.
+  Unrelated parent ``.gitignore`` files are not used.
 * Each traversed directory adds its own ``.gitignore`` rules.
   Later matching rules override earlier ones, and deeper files override
   ancestor rules.
