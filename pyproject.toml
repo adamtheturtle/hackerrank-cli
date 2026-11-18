@@ -75,7 +75,7 @@ dev = [
   "sphinx-click==6.2",
   "sphinx-lint==1.0.2",
   "sphinxcontrib-spelling==8.0.2",
-  "strict-kwargs==2026.10.9",
+  "strict-kwargs==2026.11.14",
   "towncrier==26.9",
   "twine==7.0.0",
   "ty==0.0.104",
