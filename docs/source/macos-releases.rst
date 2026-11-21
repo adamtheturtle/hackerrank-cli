@@ -1,8 +1,8 @@
 macOS releases
 ==============
 
-The standalone macOS release binary needs a Developer ID Application signature
-and Apple notarization.
+Sign and notarize the standalone executable.
+Select ``Developer ID Application`` when creating the certificate.
 These steps follow the ``coderpad-cli`` release workflow inspected at
 ``cf613fc21b457ff85fc13f89daf99ff0e9625ecf``.
 Installing the Python wheel with uv or pip does not use this binary.
@@ -19,7 +19,7 @@ Signing and verification
 
 The certificate import action creates a temporary keychain and removes it in
 its post step.
-The PKCS#12 export must contain exactly one Developer ID Application identity.
+Export exactly one identity of the Developer ID Application type to PKCS#12.
 An ambiguous identity fails the build.
 
 PyInstaller receives ``--codesign-identity "Developer ID Application"`` so that
@@ -41,7 +41,7 @@ A ticket cannot be stapled to a bare Mach-O executable.
 Gatekeeper uses its online ticket.
 ``spctl --assess --type exec`` can reject standalone code as not being an app,
 so it is not the release check.
-A future signed installer package or disk image could carry a stapled ticket
+A future signed installer package or disk image could include a stapled ticket
 for offline distribution.
 
 See `Apple's notarization workflow`_ and
@@ -62,7 +62,7 @@ binary workflow.
 The ``release`` environment on the PyPI job does not supply secrets to that
 separate job.
 
-* ``DEVELOPER_ID_APP_CERT_P12_BASE64``: the base64-encoded Developer ID
+* ``DEVELOPER_ID_APP_CERT_P12_BASE64``: the Base64 encoding of the Developer ID
   Application PKCS#12 export, including its private key.
 * ``DEVELOPER_ID_APP_CERT_PASSWORD``: the export's password.
 * ``APPLE_ID``: the Apple account used for notarization.
@@ -89,7 +89,7 @@ Secure timestamps keep previously signed releases valid after expiry.
 Before the first release, run the signing and notarization path with the
 configured credentials and inspect the downloaded artifact.
 Local signature checks and unsigned CI alone do not prove Apple's acceptance.
-No package release or live HackerRank upload is needed to test the CLI itself.
+Test the CLI locally using the offline suite.
 
 After the workflow is merged, dispatch it from ``main`` to test notarization
 without publishing a release:

@@ -44,18 +44,17 @@ Exactly one content source is required:
 Real uploads read ``HACKERRANK_API_TOKEN`` from the environment.
 Get a key from the HackerRank for Work API tokens page.
 Missing, empty, and whitespace-only keys fail clearly.
-Dry runs need no key and make no network requests.
+Dry runs run offline without credentials.
 
 Exactly one of ``--directory`` or ``--file`` is required.
 Both replace the entire project archive.
-``--file`` creates a one-file project using the source's basename; it does not
-update a language-specific code stub or upload a prebuilt ZIP as the project
-archive.
+``--file`` creates a one-file project using the basename of the source.
+This option creates a project from the file itself.
 
-All file bytes are preserved exactly, including binary files, CRLF, blank
-lines, trailing whitespace, UTF-8 BOMs, and documentation markers.
+File bytes are preserved exactly, including binary files, CRLF, blank lines,
+trailing whitespace, UTF-8 BOMs, and documentation markers.
 Empty single files are valid.
-Neither paths nor IDs are inferred from repository configuration.
+Supply paths and IDs explicitly.
 Inputs are fully read, staged, and archived before credentials are read or a
 mutation is issued.
 POSIX executable bits are preserved.
@@ -64,7 +63,7 @@ API response bodies and credentials are never printed.
 The default retry count is zero, matching the released SDK.
 Set ``--retries 3`` to delegate retries and backoff to the SDK for this
 repeatable upload.
-The CLI adds no separate retry loop.
+Retry behavior comes from the SDK.
 Each attempt uses the same prepared archive bytes.
 
 Offline archives
@@ -79,8 +78,8 @@ network access:
    hackerrank questions archive --file ./starter.py --output - > ./starter.zip
 
 ``--output`` is required.
-A file destination must not already exist; ``-`` writes only ZIP bytes to
-standard output.
+Choose a new destination file or pass ``-`` to write ZIP bytes to standard
+output.
 Shell redirection controls whether its destination is overwritten.
 Source validation and packaging finish before the output is opened.
 The source options, ignore rules, file contents, and executable permissions
@@ -130,7 +129,7 @@ Python callers can render explicit values and configure a prepared ZIP:
        configuration=configuration.to_yaml(),
    )
 
-All configuration values are required in the typed helper.
+Supply each configuration value to the typed helper.
 Callers choose their own commands, defaults, and file-selection rules.
 Existing native files may include additional configuration keys.
 Invalid YAML, invalid ZIPs, and duplicate archive names fail before writing.
@@ -148,7 +147,7 @@ Directory selection
 * Each traversed directory adds its own ``.gitignore`` rules.
   Later matching rules override earlier ones, and deeper files override
   ancestor rules.
-  Patterns are relative to their owning directory.
+  Interpret each pattern relative to the directory that defines it.
   Directory-only rules and negations follow Gitignore semantics.
   Excluded directories are pruned, so a child cannot re-include itself unless
   its parent is re-included first.
@@ -161,8 +160,8 @@ Directory selection
   rooted at a ``.git`` directory.
   Repeatable ``--exclude PATTERN`` options form a final Gitignore rule layer,
   relative to the upload root.
-  This layer can exclude files re-included by ``.gitignore``; its own later
-  negations can undo its earlier patterns.
+  This layer can exclude files re-included by ``.gitignore``.
+  Later negations in this layer take precedence over its earlier patterns.
   It cannot re-include a file excluded by ``.gitignore`` or Git metadata.
 * ZIP files are included by default.
   Use ``--exclude '*.zip'`` to omit them.
@@ -190,8 +189,8 @@ There are no prebuilt artifacts yet.
 See ``docs/source/migration.rst`` for migrating an existing shell uploader and
 keeping repository-specific snippet preparation outside this CLI.
 
-Project AI system prompts
--------------------------
+System prompts for project questions
+------------------------------------
 
 Set an existing project question's AI assistant prompt from a UTF-8 file:
 
@@ -225,7 +224,7 @@ to inspect parameters and body schemas.
 Real v3 requests use ``HACKERRANK_API_TOKEN``.
 SCIM requests use their own ``HACKERRANK_SCIM_API_TOKEN`` and provisioning
 host.
-Dry runs validate requests before reading credentials and make no API calls.
+Dry runs validate requests offline, before reading credentials.
 Responses include status, headers and complete JSON data, including empty and
 pending responses.
 

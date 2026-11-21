@@ -30,7 +30,7 @@ It does not import private SDK helpers or install an unreleased Git dependency.
 
 Tests use the real SDK with its public ``Transport`` interface and default
 HTTPX transport.
-No SDK methods are replaced and no live questions are mutated.
+Tests exercise the SDK directly against the mock API.
 RESPX intercepts the HTTP boundary and fails closed for unregistered requests.
 Upload tests inspect the actual multipart body and ZIP bytes, assert the
 absence of metadata updates, preserve text, binary contents and executable
@@ -40,7 +40,7 @@ The SDK's checked-in Swagger specification does not describe the
 ``upload_project_zip`` endpoint.
 The upload tests so assert the released SDK's actual wire behavior instead of
 inventing an OpenAPI schema.
-No separate mock-spec repository is needed for this scope.
+The mock specification is included here.
 
 Add a Towncrier feature or bugfix fragment in Markdown for each user-visible
 change, such as ``newsfragments/123.bugfix.md``.
@@ -100,7 +100,7 @@ External setup
   ``adamtheturtle``, repository ``hackerrank-cli``, workflow ``release.yml``,
   environment ``release``.
   That GitHub environment already exists.
-  No PyPI token is stored in the repository.
+  PyPI uses trusted publishing instead of a repository token.
 * GitHub Pages is already enabled with the GitHub Actions source.
   Manually run ``publish-site.yml`` from ``main`` to redeploy documentation.
   Ordinary CI builds documentation without deploying it.
@@ -109,8 +109,8 @@ External setup
   Make the GHCR package public after the first release if needed.
 * Configure the five macOS signing and notarization repository secrets in
   :doc:`macos-releases` before releasing.
-  A missing credential fails the build; releases cannot fall back to an
-  unsigned macOS binary.
+  The build fails if a credential is missing.
+  A macOS release requires a signed binary.
 * No Homebrew tap, winget manifest, package-manager registration, or TestPyPI
   configuration has been created.
   Do not advertise those installation paths until they exist.
@@ -141,7 +141,7 @@ Checks cover dependency declarations, dead code, package metadata, docstrings,
 keyword-only parameters, documentation examples, shell commands, and Actions
 security alongside the four strict type checkers and branch coverage.
 Generated version files are excluded from source checks.
-The SDK owns its HTTP client and models.
+The SDK provides the HTTP client and models.
 
 Literalizer CLI check parity
 ----------------------------
@@ -150,8 +150,7 @@ Additional checks follow ``literalizer-cli`` at commit
 ``cf435b8ee67dd9900d795a8438622ad02aaaf730``.
 The dedicated ``uv-lock`` hook checks that dependency metadata and the lockfile
 agree.
-All Python source files are checked, including documentation and binary
-wrappers.
+The checks include Python source in documentation and binary wrappers.
 Tests run in parallel and check runtime types in the public package, tests, and
 fixtures.
 Help text for every command is compared with committed regression snapshots.
