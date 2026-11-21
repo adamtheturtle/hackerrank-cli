@@ -1,10 +1,14 @@
 hackerrank-cli
 ==============
 
-Upload starter files to an existing HackerRank for Work project question using the ``hackerrank`` Python SDK.
-This independent CLI replaces only the project archive, preserving the question's name, problem statement, environment, scoring settings, and other metadata.
+Upload starter files to an existing HackerRank for Work project question using
+the ``hackerrank`` Python SDK.
+This independent CLI replaces only the project archive, preserving the
+question's name, problem statement, environment, scoring settings, and other
+metadata.
 
-The initial scope is project questions such as fullstack, frontend, and backend projects.
+The initial scope is project questions such as fullstack, frontend, and backend
+projects.
 Language-specific coding-question stubs are outside this CLI's initial scope.
 
 Requires Python 3.13 or later.
@@ -47,22 +51,26 @@ Both replace the entire project archive.
 ``--file`` creates a one-file project using the basename of the source.
 This option creates a project from the file itself.
 
-File bytes are preserved exactly, including binary files, CRLF, blank lines, trailing whitespace, UTF-8 BOMs, and documentation markers.
+File bytes are preserved exactly, including binary files, CRLF, blank lines,
+trailing whitespace, UTF-8 BOMs, and documentation markers.
 Empty single files are valid.
 Supply paths and IDs explicitly.
-Inputs are fully read, staged, and archived before credentials are read or a mutation is issued.
+Inputs are fully read, staged, and archived before credentials are read or a
+mutation is issued.
 POSIX executable bits are preserved.
 Errors exit nonzero.
 API response bodies and credentials are never printed.
 The default retry count is zero, matching the released SDK.
-Set ``--retries 3`` to delegate retries and backoff to the SDK for this repeatable upload.
+Set ``--retries 3`` to delegate retries and backoff to the SDK for this
+repeatable upload.
 Retry behavior comes from the SDK.
 Each attempt uses the same prepared archive bytes.
 
 Offline archives
 ----------------
 
-Export the same project ZIP locally without a question ID, credentials, or network access:
+Export the same project ZIP locally without a question ID, credentials, or
+network access:
 
 .. code-block:: console
 
@@ -70,20 +78,26 @@ Export the same project ZIP locally without a question ID, credentials, or netwo
    hackerrank questions archive --file ./starter.py --output - > ./starter.zip
 
 ``--output`` is required.
-Choose a new destination file or pass ``-`` to write ZIP bytes to standard output.
+Choose a new destination file or pass ``-`` to write ZIP bytes to standard
+output.
 Shell redirection controls whether its destination is overwritten.
 Source validation and packaging finish before the output is opened.
-The source options, ignore rules, file contents, and executable permissions match ``questions upload``.
-Consumers can extract this archive for local checks, then send its bytes with the SDK's ``questions.upload_project_zip`` method.
+The source options, ignore rules, file contents, and executable permissions
+match ``questions upload``.
+Consumers can extract this archive for local checks, then send its bytes with
+the SDK's ``questions.upload_project_zip`` method.
 
 Native project configuration
 ----------------------------
 
-Both ``questions archive`` and ``questions upload`` accept ``--configuration-file ./native.yml``.
-The file must contain a UTF-8 native HackerRank document with ``version: 1.0`` and a ``configuration`` mapping.
+Both ``questions archive`` and ``questions upload`` accept
+``--configuration-file ./native.yml``.
+The file must contain a UTF-8 native HackerRank document with ``version: 1.0``
+and a ``configuration`` mapping.
 Its bytes replace the root ``hackerrank.yml`` entry or add it if absent.
 Other files and their executable permissions are preserved.
-Dry runs validate the configuration and include ``hackerrank.yml`` in the file listing without credentials or network requests.
+Dry runs validate the configuration and include ``hackerrank.yml`` in the file
+listing without credentials or network requests.
 
 Python callers can render explicit values and configure a prepared ZIP:
 
@@ -126,44 +140,54 @@ Directory selection
 * Both Git and non-Git directories work.
   Paths are relative to the current working directory.
   A Git worktree's ``.git`` file also identifies its root.
-* In a Git repository, rules are inherited from the nearest Git root down to the upload directory.
+* In a Git repository, rules are inherited from the nearest Git root down to
+  the upload directory.
   Outside Git, rules start at the upload directory.
   Unrelated parent ``.gitignore`` files are not used.
 * Each traversed directory adds its own ``.gitignore`` rules.
-  Later matching rules override earlier ones, and deeper files override ancestor rules.
+  Later matching rules override earlier ones, and deeper files override
+  ancestor rules.
   Interpret each pattern relative to the directory that defines it.
   Directory-only rules and negations follow Gitignore semantics.
-  Excluded directories are pruned, so a child cannot re-include itself unless its parent is re-included first.
+  Excluded directories are pruned, so a child cannot re-include itself unless
+  its parent is re-included first.
   This also applies to ancestors of an explicitly selected nested upload root.
 * Ignore rules apply to tracked files too.
   Global Git excludes and ``.git/info/exclude`` are not read.
   Hidden files, including ``.gitignore``, are uploaded unless excluded.
 * ``.git`` files and directories are always excluded at every depth.
-  Explicit source paths inside Git metadata are rejected, including an upload rooted at a ``.git`` directory.
-  Repeatable ``--exclude PATTERN`` options form a final Gitignore rule layer, relative to the upload root.
+  Explicit source paths inside Git metadata are rejected, including an upload
+  rooted at a ``.git`` directory.
+  Repeatable ``--exclude PATTERN`` options form a final Gitignore rule layer,
+  relative to the upload root.
   This layer can exclude files re-included by ``.gitignore``.
   Later negations in this layer take precedence over its earlier patterns.
   It cannot re-include a file excluded by ``.gitignore`` or Git metadata.
 * ZIP files are included by default.
   Use ``--exclude '*.zip'`` to omit them.
   Add other exclusions explicitly, such as ``--exclude node_modules/``.
-* Selected symlinks (including directory, broken, and external links) and symlinks in the source path are rejected rather than dereferenced.
+* Selected symlinks (including directory, broken, and external links) and
+  symlinks in the source path are rejected rather than dereferenced.
   Ignored links are skipped.
   Symlinked ``.gitignore`` files are rejected when their rules would be read.
   Special files are rejected.
   Empty selections fail.
-  Selected files are copied to a temporary directory without dereferencing links.
+  Selected files are copied to a temporary directory without dereferencing
+  links.
   The CLI packages these prepared files with Python's standard ZIP library.
-  The released SDK handles multipart serialization, authentication, network requests, response decoding, and retries.
+  The released SDK handles multipart serialization, authentication, network
+  requests, response decoding, and retries.
 
 Development and distribution
 ----------------------------
 
-Development checks, release setup, and build instructions for Docker, Nix, and standalone binaries are in ``docs/source/development.rst``.
+Development checks, release setup, and build instructions for Docker, Nix, and
+standalone binaries are in ``docs/source/development.rst``.
 The generated CLI reference is in ``docs/source/cli.rst``.
 There are no prebuilt artifacts yet.
 
-See ``docs/source/migration.rst`` for migrating an existing shell uploader and keeping repository-specific snippet preparation outside this CLI.
+See ``docs/source/migration.rst`` for migrating an existing shell uploader and
+keeping repository-specific snippet preparation outside this CLI.
 
 System prompts for project questions
 -------------------------
@@ -184,8 +208,10 @@ A missing problem statement or duration fails before the update.
 Complete API access
 -------------------
 
-The ``api`` command group exposes all 76 documented v3, ATS and SCIM operations.
-Use ``hackerrank api operations`` to list names and ``api describe OPERATION`` to inspect parameters and body schemas.
+The ``api`` command group exposes all 76 documented v3, ATS and SCIM
+operations.
+Use ``hackerrank api operations`` to list names and ``api describe OPERATION``
+to inspect parameters and body schemas.
 
 .. code-block:: console
 
@@ -193,10 +219,13 @@ Use ``hackerrank api operations`` to list names and ``api describe OPERATION`` t
    hackerrank api call api_update_interviewer_note --path '{"interview_id": "123"}' --body-file note.json --dry-run
 
 ``--path`` and ``--query`` accept JSON objects.
-``--body-file`` reads a JSON object from a UTF-8 file, or stdin when set to ``-``.
+``--body-file`` reads a JSON object from a UTF-8 file, or stdin when set to
+``-``.
 Real v3 requests use ``HACKERRANK_API_TOKEN``.
-SCIM requests use their own ``HACKERRANK_SCIM_API_TOKEN`` and provisioning host.
+SCIM requests use their own ``HACKERRANK_SCIM_API_TOKEN`` and provisioning
+host.
 Dry runs validate requests offline, before reading credentials.
-Responses include status, headers and complete JSON data, including empty and pending responses.
+Responses include status, headers and complete JSON data, including empty and
+pending responses.
 
 The complete API commands require ``hackerrank>=2026.11.7``.
