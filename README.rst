@@ -190,7 +190,7 @@ See ``docs/source/migration.rst`` for migrating an existing shell uploader and
 keeping repository-specific snippet preparation outside this CLI.
 
 System prompts for project questions
--------------------------
+------------------------------------
 
 Set an existing project question's AI assistant prompt from a UTF-8 file:
 
