@@ -765,8 +765,8 @@ wheels = [
 
 [[package]]
 name = "hackerrank"
-version = "2026.11.24.1.post2+g55f25348c"
-source = { git = "https://github.com/adamtheturtle/hackerrank.git?rev=55f25348c2254778e2177ff105e22b89a94a61a9#55f25348c2254778e2177ff105e22b89a94a61a9" }
+version = "2026.11.24.2"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beartype" },
     { name = "httpx" },
@@ -774,6 +774,10 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "tenacity" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cd/2b/f7c121045ebdbf65c41ef4c24402c65b6d4dc6167e59890e41276e6237c2/hackerrank-2026.11.24.2.tar.gz", hash = "sha256:a8e0400079e2de6c90f63d611386cb2d347bceb3a33e66893ded340043f55f07", size = 216546, upload-time = "2026-11-24T23:31:04.026Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/15/00/4979705927bc94aa0dea1e8005264d43e216ad76fffcde6d7cf8fc2fd96d/hackerrank-2026.11.24.2-py3-none-any.whl", hash = "sha256:5fc46bab9fc3678f9f3e915a0db734b5be037004037f423a496681c204372de8", size = 101288, upload-time = "2026-11-24T23:31:02.678Z" },
 ]
 
 [[package]]
@@ -844,7 +848,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3,<8.6" },
-    { name = "hackerrank", git = "https://github.com/adamtheturtle/hackerrank.git?rev=55f25348c2254778e2177ff105e22b89a94a61a9" },
+    { name = "hackerrank", specifier = ">=2026.11.24.2" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "httpx2", specifier = ">=2.12" },
     { name = "pathspec", specifier = ">=1" },

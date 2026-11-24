@@ -23,7 +23,7 @@ classifiers = [
 dynamic = [ "version" ]
 dependencies = [
   "click>=8.3,<8.6",
-  "hackerrank @ git+https://github.com/adamtheturtle/hackerrank.git@55f25348c2254778e2177ff105e22b89a94a61a9",
+  "hackerrank>=2026.11.24.2",
   "httpx>=0.28",
   "httpx2>=2.12",
   "pathspec>=1",
