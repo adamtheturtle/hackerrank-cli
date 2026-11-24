@@ -158,7 +158,7 @@ def indexed_files(
         {
             Path(os.fsdecode(filename=name))
             for name in result.stdout.split(sep=b"\0")
-            if name
+            if name != b""
         }
     ):
         if exclusion_spec.match_file(file=relative.as_posix()) or any(

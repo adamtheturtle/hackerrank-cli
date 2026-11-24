@@ -182,8 +182,8 @@ def test_git_index_selection(tmp_path: Path) -> None:
     cli = create_cli(transport=transport)
     runner = CliRunner()
     for flags, expected in [
-        ([], {"solution.txt"}),
-        (["--git-index"], {"solution.txt", "tracked.db"}),
+        ((), {"solution.txt"}),
+        (("--git-index",), {"solution.txt", "tracked.db"}),
     ]:
         archived = runner.invoke(
             cli=cli,
