@@ -125,9 +125,7 @@ def selected_files(
 def indexed_files(
     *, directory: Path, excludes: tuple[str, ...]
 ) -> tuple[Path, ...]:
-    """List tracked and non-ignored untracked paths from a Git
-    checkout.
-    """
+    """List paths from the Git index and repository ignore rules."""
     git = which(cmd="git")
     if git is None:
         msg = "--git-index requires Git."
@@ -170,7 +168,7 @@ def indexed_files(
         path = directory / relative
         validate_path(path=path)
         if not path.exists() or path.is_dir():
-            # Missing worktree files and Gitlinks carry no file contents.
+            # Git may list paths without file contents to package.
             continue
         require_regular_file(path=path)
         files.append(relative)
