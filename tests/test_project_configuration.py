@@ -2,92 +2,18 @@
 
 from io import BytesIO
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
+from zipfile import ZipFile
 
 import pytest
-import yaml
 from click.testing import CliRunner
 
 from hackerrank_cli import create_cli
-from hackerrank_cli.projects import (
-    ProjectConfiguration,
-    configure_project_archive,
-)
 from tests.test_cli import recording_transport
 
-_EXECUTABLE_MODE = 0o100755
 _NATIVE = (
     b"version: 1.0\nconfiguration:\n"
     b"  has_webserver: false\n  future_setting: keep\n"
 )
-
-
-def _zip(*, existing: bool) -> bytes:
-    """Include binary bytes, executable permissions, and entry
-    metadata.
-    """
-    with BytesIO() as buffer:
-        with ZipFile(
-            file=buffer, mode="w", compression=ZIP_DEFLATED
-        ) as archive:
-            info = ZipInfo(filename="run.sh")
-            info.external_attr = _EXECUTABLE_MODE << 16
-            info.comment = b"Keep this comment"
-            archive.writestr(
-                zinfo_or_arcname=info, data=b"#!/bin/sh\n\x00\xff"
-            )
-            if existing:
-                archive.writestr(
-                    zinfo_or_arcname="hackerrank.yml", data=b"old"
-                )
-        return buffer.getvalue()
-
-
-@pytest.mark.parametrize(argnames="existing", argvalues=[False, True])
-def test_configure_preserves_other_entries(*, existing: bool) -> None:
-    """Adding or replacing the root configuration preserves other ZIP
-    metadata.
-    """
-    configured = configure_project_archive(
-        archive=_zip(existing=existing), configuration=_NATIVE
-    )
-    with ZipFile(file=BytesIO(initial_bytes=configured)) as archive:
-        assert sorted(archive.namelist()) == ["hackerrank.yml", "run.sh"]
-        assert archive.read(name="hackerrank.yml") == _NATIVE
-        assert archive.read(name="run.sh") == b"#!/bin/sh\n\x00\xff"
-        info = archive.getinfo(name="run.sh")
-        assert info.external_attr >> 16 == _EXECUTABLE_MODE
-        assert info.comment == b"Keep this comment"
-
-
-def test_explicit_configuration_document() -> None:
-    """Typed values render the native hierarchy without choosing
-    policy.
-    """
-    rendered = ProjectConfiguration(
-        has_webserver=False,
-        readonly_paths=["tests"],
-        scoring_command="grade",
-        scoring_files=["report.xml"],
-        default_open_files=["solution.py"],
-        project_menu={"install": "install", "run": "run", "test": "test"},
-    ).to_yaml()
-    assert yaml.safe_load(stream=rendered) == {
-        "version": 1.0,
-        "configuration": {
-            "has_webserver": False,
-            "readonly_paths": ["tests"],
-            "scoring": {"command": "grade", "files": ["report.xml"]},
-            "ide_config": {
-                "default_open_files": ["solution.py"],
-                "project_menu": {
-                    "install": "install",
-                    "run": "run",
-                    "test": "test",
-                },
-            },
-        },
-    }
 
 
 @pytest.mark.parametrize(
@@ -201,26 +127,3 @@ def test_export_upload_and_dry_run(
         assert {
             name: sent.read(name=name) for name in sent.namelist()
         } == expected
-
-
-def test_bad_zip() -> None:
-    """A prepared archive must actually be a ZIP."""
-    with pytest.raises(expected_exception=ValueError, match="valid ZIP"):
-        _ = configure_project_archive(
-            archive=b"not a zip", configuration=_NATIVE
-        )
-
-
-def test_duplicate_entries() -> None:
-    """Repeated names cannot produce an ambiguous configured archive."""
-    with BytesIO() as buffer:
-        with ZipFile(file=buffer, mode="w") as archive:
-            archive.writestr(zinfo_or_arcname="solution.py", data=b"one")
-            with pytest.warns(
-                expected_warning=UserWarning, match="Duplicate name"
-            ):
-                archive.writestr(zinfo_or_arcname="solution.py", data=b"two")
-        with pytest.raises(expected_exception=ValueError, match="duplicate"):
-            _ = configure_project_archive(
-                archive=buffer.getvalue(), configuration=_NATIVE
-            )

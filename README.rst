@@ -99,7 +99,8 @@ Other files and their executable permissions are preserved.
 Dry runs validate the configuration and include ``hackerrank.yml`` in the file
 listing without credentials or network requests.
 
-Python callers can use the SDK to configure a prepared ZIP.
+Python callers can configure a prepared ZIP with the SDK's
+``hackerrank.project_configuration`` module.
 
 .. code-block:: python
 
