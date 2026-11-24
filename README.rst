@@ -165,9 +165,9 @@ Directory selection
   It cannot re-include a file excluded by ``.gitignore`` or Git metadata.
 * Use ``--git-index`` with ``--directory`` on either command to include
   existing tracked files even if they match ``.gitignore``.
-  This mode requires Git and supports nested source directories and worktrees.
+  This mode requires Git and supports nested source directories in a linked worktree.
   It skips deleted files and submodules.
-  Untracked files still follow repository ``.gitignore`` rules, and explicit
+  Files that Git does not track still follow repository ``.gitignore`` rules, and explicit
   ``--exclude`` patterns apply to both groups.
 * ZIP files are included by default.
   Use ``--exclude '*.zip'`` to omit them.

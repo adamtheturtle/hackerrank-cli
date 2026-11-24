@@ -69,7 +69,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
     @click.option(
         "--git-index",
         is_flag=True,
-        help="Include tracked files even when they match .gitignore.",
+        help="Include tracked files even if ignored.",
     )
     @click.option(
         "--dry-run",
@@ -136,7 +136,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
     @click.option(
         "--git-index",
         is_flag=True,
-        help="Include tracked files even when they match .gitignore.",
+        help="Include tracked files even if ignored.",
     )
     @click.option(
         "--output",
