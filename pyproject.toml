@@ -99,7 +99,7 @@ version_scheme = "post-release"
 [tool.uv]
 # Dependabot currently ships uv 0.12.18; CI pins uv separately.
 required-version = ">=0.12.18"
-sources.hackerrank = { git = "https://github.com/adamtheturtle/hackerrank.git", rev = "f8dc936913384fd1c100e63ef0050bfe4f46b551" }
+sources.hackerrank = { git = "https://github.com/adamtheturtle/hackerrank.git", rev = "9455edda339ad62ba8c552ca5dd4c263dcd88a67" }
 
 [tool.ruff]
 line-length = 79
