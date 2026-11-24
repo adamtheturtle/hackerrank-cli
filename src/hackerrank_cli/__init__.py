@@ -67,6 +67,11 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         help="Additional Gitignore pattern at the upload root. Repeatable.",
     )
     @click.option(
+        "--git-index",
+        is_flag=True,
+        help="Include tracked files even when they match .gitignore.",
+    )
+    @click.option(
         "--dry-run",
         is_flag=True,
         help="Validate and list files without credentials or network access.",
@@ -87,6 +92,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         *,
         configuration_file: Path | None,
         dry_run: bool,
+        git_index: bool,
     ) -> None:
         """Replace project starter files while preserving question
         metadata.
@@ -100,6 +106,7 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
             retries=retries,
             dry_run=dry_run,
             transport=transport,
+            git_index=git_index,
         )
 
     @click.option(
@@ -127,6 +134,11 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
         help="Additional Gitignore pattern at the upload root. Repeatable.",
     )
     @click.option(
+        "--git-index",
+        is_flag=True,
+        help="Include tracked files even when they match .gitignore.",
+    )
+    @click.option(
         "--output",
         type=click.Path(dir_okay=False, allow_dash=True),
         required=True,
@@ -135,21 +147,29 @@ def create_cli(*, transport: Transport | None = None) -> click.Group:
             "Never overwrites files."
         ),
     )
-    def archive(
+    def archive(  # noqa: PLR0913 - Click command options.
         directory: Path | None,
         source_file: Path | None,
         configuration_file: Path | None,
         exclude: tuple[str, ...],
         output: str,
+        *,
+        git_index: bool,
     ) -> None:
         """Export a project ZIP without credentials or network access."""
         _validate_source(
-            directory=directory, source_file=source_file, exclude=exclude
+            directory=directory,
+            source_file=source_file,
+            exclude=exclude,
+            git_index=git_index,
         )
         with (
             _preparation_errors(),
             prepare_source(
-                directory=directory, file=source_file, excludes=exclude
+                directory=directory,
+                file=source_file,
+                excludes=exclude,
+                git_index=git_index,
             ) as source,
         ):
             contents = _project_zip(
@@ -276,6 +296,8 @@ def _validate_source(
     directory: Path | None,
     source_file: Path | None,
     exclude: tuple[str, ...],
+    *,
+    git_index: bool,
 ) -> None:
     """Validate the shared archive and upload source options."""
     if (directory is None) == (source_file is None):
@@ -283,6 +305,9 @@ def _validate_source(
         raise click.UsageError(message=msg)
     if len(exclude) > 0 and directory is None:
         msg = "--exclude requires --directory."
+        raise click.UsageError(message=msg)
+    if git_index and directory is None:
+        msg = "--git-index requires --directory."
         raise click.UsageError(message=msg)
 
 
@@ -378,12 +403,14 @@ def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
     retries: int,
     dry_run: bool,
     transport: Transport | None,
+    git_index: bool,
 ) -> None:
     """Prepare every byte before credentials or a network mutation."""
     _validate_source(
         directory=directory,
         source_file=source_file,
         exclude=exclude,
+        git_index=git_index,
     )
     if (
         not question_id.isascii()
@@ -395,7 +422,10 @@ def _upload(  # noqa: PLR0913 - Click options plus the SDK transport boundary.
     with (
         _preparation_errors(),
         prepare_source(
-            directory=directory, file=source_file, excludes=exclude
+            directory=directory,
+            file=source_file,
+            excludes=exclude,
+            git_index=git_index,
         ) as source,
     ):
         archive = _project_zip(

@@ -10,6 +10,8 @@ Options:
                              the archive root.
   --exclude TEXT             Additional Gitignore pattern at the upload root.
                              Repeatable.
+  --git-index                Include tracked files even when they match
+                             .gitignore.
   --output FILE              New ZIP file, or - for binary standard output.
                              Never overwrites files.  [required]
   --help                     Show this message and exit.

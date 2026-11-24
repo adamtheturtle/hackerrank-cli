@@ -1,11 +1,13 @@
 """Prepare local sources before handing them to the SDK."""
 
+import os
 import stat
+import subprocess
 from collections.abc import Generator, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from shutil import copyfile, copymode
+from shutil import copyfile, copymode, which
 from tempfile import TemporaryDirectory
 
 from pathspec import GitIgnoreSpec
@@ -120,6 +122,59 @@ def selected_files(
     return tuple(walk(parent=directory, rules=inherited))
 
 
+def indexed_files(
+    *, directory: Path, excludes: tuple[str, ...]
+) -> tuple[Path, ...]:
+    """List tracked and non-ignored untracked paths from a Git checkout."""
+    git = which(cmd="git")
+    if git is None:
+        msg = "--git-index requires Git."
+        raise ValueError(msg)
+    try:
+        result = subprocess.run(  # noqa: S603 - Fixed Git arguments.
+            args=[
+                git,
+                "ls-files",
+                "-z",
+                "--cached",
+                "--others",
+                "--exclude-per-directory=.gitignore",
+                "--",
+                ".",
+            ],
+            cwd=directory,
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as error:
+        msg = "--git-index requires a source directory in a Git checkout."
+        raise ValueError(msg) from error
+
+    exclusion_spec = GitIgnoreSpec.from_lines(lines=excludes)
+    files: list[Path] = []
+    for relative in sorted(
+        {
+            Path(os.fsdecode(filename=name))
+            for name in result.stdout.split(sep=b"\0")
+            if name
+        }
+    ):
+        if exclusion_spec.match_file(file=relative.as_posix()) or any(
+            exclusion_spec.match_file(file=parent.as_posix() + "/")
+            for parent in relative.parents
+            if parent != Path()
+        ):
+            continue
+        path = directory / relative
+        validate_path(path=path)
+        if not path.exists() or path.is_dir():
+            # Missing worktree files and Gitlinks carry no file contents.
+            continue
+        require_regular_file(path=path)
+        files.append(relative)
+    return tuple(files)
+
+
 @dataclass(frozen=True)
 class PreparedSource:
     """Validated bytes or an isolated directory for ZIP preparation."""
@@ -132,7 +187,11 @@ class PreparedSource:
 
 @contextmanager
 def prepare_source(
-    *, directory: Path | None, file: Path | None, excludes: tuple[str, ...]
+    *,
+    directory: Path | None,
+    file: Path | None,
+    excludes: tuple[str, ...],
+    git_index: bool = False,
 ) -> Generator[PreparedSource]:
     """Read or stage everything before allowing a network mutation."""
     if file is not None:
@@ -157,7 +216,11 @@ def prepare_source(
     if not directory.is_dir():
         msg = f"Not a directory: {directory}"
         raise ValueError(msg)
-    files = selected_files(directory=directory, excludes=excludes)
+    files = (
+        indexed_files(directory=directory, excludes=excludes)
+        if git_index
+        else selected_files(directory=directory, excludes=excludes)
+    )
     if len(files) == 0:
         msg = "No files selected for upload."
         raise ValueError(msg)
