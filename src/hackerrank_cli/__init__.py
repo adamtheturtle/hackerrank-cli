@@ -13,10 +13,8 @@ import httpx
 import httpx2
 from hackerrank.client import HackerRank
 from hackerrank.exceptions import HackerRankError
-from hackerrank.projects import (
-    build_project_archive,
-    configure_project_archive,
-)
+from hackerrank.project_configuration import configure_project_archive
+from hackerrank.projects import build_project_archive
 from hackerrank.transports import Transport
 from hackerrank.types import QuestionChanges
 

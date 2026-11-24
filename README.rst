@@ -107,21 +107,25 @@ Python callers can use the SDK to configure a prepared ZIP.
 
    from pathlib import Path
 
-   from hackerrank.projects import (
+   from hackerrank.project_configuration import (
        ProjectConfiguration,
        configure_project_archive,
    )
 
    configuration = ProjectConfiguration(
-       has_webserver=False,
-       readonly_paths=[],
-       scoring_command="python3 -m pytest",
-       scoring_files=[],
-       default_open_files=["solution.py"],
-       project_menu={
-           "install": "python3 -m pip install -r requirements.txt",
-           "run": "python3 solution.py",
-           "test": "python3 -m pytest",
+       version=1.0,
+       configuration={
+           "has_webserver": False,
+           "readonly_paths": [],
+           "scoring": {"command": "python3 -m pytest", "files": []},
+           "ide_config": {
+               "default_open_files": ["solution.py"],
+               "project_menu": {
+                   "install": "python3 -m pip install -r requirements.txt",
+                   "run": "python3 solution.py",
+                   "test": "python3 -m pytest",
+               },
+           },
        },
    )
    configured_zip = configure_project_archive(

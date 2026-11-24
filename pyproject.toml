@@ -23,7 +23,7 @@ classifiers = [
 dynamic = [ "version" ]
 dependencies = [
   "click>=8.3,<8.6",
-  "hackerrank>=2026.11.10.4",
+  "hackerrank>=2026.11.24",
   "httpx>=0.28",
   "httpx2>=2.12",
   "pathspec>=1",
@@ -99,7 +99,6 @@ version_scheme = "post-release"
 [tool.uv]
 # Dependabot currently ships uv 0.12.18; CI pins uv separately.
 required-version = ">=0.12.18"
-sources.hackerrank = { git = "https://github.com/adamtheturtle/hackerrank.git", rev = "71035b10fa215e692b2fc38e19a51aa1b182c15e" }
 
 [tool.ruff]
 line-length = 79
