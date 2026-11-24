@@ -765,18 +765,14 @@ wheels = [
 
 [[package]]
 name = "hackerrank"
-version = "2026.11.10.4.post58+g9455edda3"
-source = { git = "https://github.com/adamtheturtle/hackerrank.git?rev=9455edda339ad62ba8c552ca5dd4c263dcd88a67#9455edda339ad62ba8c552ca5dd4c263dcd88a67" }
+version = "2026.11.10.4.post61+gf045e7753"
+source = { git = "https://github.com/adamtheturtle/hackerrank.git?rev=f045e77535bf18a67c10496579f7ad14464c6862#f045e77535bf18a67c10496579f7ad14464c6862" }
 dependencies = [
     { name = "beartype" },
     { name = "httpx" },
     { name = "httpx2" },
-    { name = "tenacity" },
-]
-
-[package.optional-dependencies]
-projects = [
     { name = "pyyaml" },
+    { name = "tenacity" },
 ]
 
 [[package]]
@@ -784,7 +780,7 @@ name = "hackerrank-cli"
 source = { editable = "." }
 dependencies = [
     { name = "click" },
-    { name = "hackerrank", extra = ["projects"] },
+    { name = "hackerrank" },
     { name = "httpx" },
     { name = "httpx2" },
     { name = "pathspec" },
@@ -849,7 +845,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3,<8.6" },
-    { name = "hackerrank", extras = ["projects"], git = "https://github.com/adamtheturtle/hackerrank.git?rev=9455edda339ad62ba8c552ca5dd4c263dcd88a67" },
+    { name = "hackerrank", git = "https://github.com/adamtheturtle/hackerrank.git?rev=f045e77535bf18a67c10496579f7ad14464c6862" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "httpx2", specifier = ">=2.12" },
     { name = "pathspec", specifier = ">=1" },
