@@ -27,7 +27,6 @@ dependencies = [
   "httpx>=0.28",
   "httpx2>=2.12",
   "pathspec>=1",
-  "pyyaml>=6",
 ]
 urls.Documentation = "https://adamtheturtle.github.io/hackerrank-cli/"
 urls.Issues = "https://github.com/adamtheturtle/hackerrank-cli/issues"
@@ -64,6 +63,7 @@ dev = [
   "pytest-cov==7.1",
   "pytest-regressions==2.11.0",
   "pytest-xdist==3.8.0",
+  "pyyaml>=6",
   "respx==0.23.1",
   "ruff==0.17.5",
   "setuptools>=77",

@@ -788,7 +788,6 @@ dependencies = [
     { name = "httpx" },
     { name = "httpx2" },
     { name = "pathspec" },
-    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -824,6 +823,7 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-regressions" },
     { name = "pytest-xdist" },
+    { name = "pyyaml" },
     { name = "respx" },
     { name = "ruff" },
     { name = "setuptools" },
@@ -853,7 +853,6 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28" },
     { name = "httpx2", specifier = ">=2.12" },
     { name = "pathspec", specifier = ">=1" },
-    { name = "pyyaml", specifier = ">=6" },
 ]
 
 [package.metadata.requires-dev]
@@ -887,6 +886,7 @@ dev = [
     { name = "pytest-cov", specifier = "==7.1" },
     { name = "pytest-regressions", specifier = "==2.11.0" },
     { name = "pytest-xdist", specifier = "==3.8.0" },
+    { name = "pyyaml", specifier = ">=6" },
     { name = "respx", specifier = "==0.23.1" },
     { name = "ruff", specifier = "==0.17.5" },
     { name = "setuptools", specifier = ">=77" },
