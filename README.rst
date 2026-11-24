@@ -84,8 +84,6 @@ Shell redirection controls whether its destination is overwritten.
 Source validation and packaging finish before the output is opened.
 The source options, ignore rules, file contents, and executable permissions
 match ``questions upload``.
-Consumers can extract this archive for local checks, then send its bytes with
-the SDK's ``questions.upload_project_zip`` method.
 
 Native project configuration
 ----------------------------
@@ -99,45 +97,8 @@ Other files and their executable permissions are preserved.
 Dry runs validate the configuration and include ``hackerrank.yml`` in the file
 listing without credentials or network requests.
 
-Python callers can configure a prepared ZIP with the SDK's
-``hackerrank.project_configuration`` module.
-
-.. code-block:: python
-
-   """Add native configuration to a prepared project archive."""
-
-   from pathlib import Path
-
-   from hackerrank.project_configuration import (
-       ProjectConfiguration,
-       configure_project_archive,
-   )
-
-   configuration = ProjectConfiguration(
-       version=1.0,
-       configuration={
-           "has_webserver": False,
-           "readonly_paths": [],
-           "scoring": {"command": "python3 -m pytest", "files": []},
-           "ide_config": {
-               "default_open_files": ["solution.py"],
-               "project_menu": {
-                   "install": "python3 -m pip install -r requirements.txt",
-                   "run": "python3 solution.py",
-                   "test": "python3 -m pytest",
-               },
-           },
-       },
-   )
-   configured_zip = configure_project_archive(
-       archive=Path("starter.zip").read_bytes(),
-       configuration=configuration.to_yaml(),
-   )
-
-Supply each configuration value to the typed helper.
-Callers choose their own commands, defaults, and file-selection rules.
 Existing native files may include additional configuration keys.
-Invalid YAML, invalid ZIPs, and duplicate archive names fail before writing.
+Invalid YAML fails before the CLI writes an archive or uploads it.
 
 Directory selection
 -------------------

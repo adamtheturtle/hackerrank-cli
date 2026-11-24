@@ -38,8 +38,6 @@ layout candidates receive:
    hackerrank questions archive --directory ./starter --exclude '*.zip' --output ./starter.zip
 
 Extract the archive in a temporary directory to run project checks.
-An uploader that already uses the SDK can send the exported bytes with
-``questions.upload_project_zip`` instead of maintaining another ZIP builder.
 The export command selects and packages sources the same way as uploads.
 It runs offline without an API token.
 
