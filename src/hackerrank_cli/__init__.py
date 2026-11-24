@@ -13,6 +13,10 @@ import httpx
 import httpx2
 from hackerrank.client import HackerRank
 from hackerrank.exceptions import HackerRankError
+from hackerrank.projects import (
+    build_project_archive,
+    configure_project_archive,
+)
 from hackerrank.transports import Transport
 from hackerrank.types import QuestionChanges
 
@@ -23,7 +27,6 @@ from hackerrank_cli._sources import (
     require_regular_file,
     validate_path,
 )
-from hackerrank_cli.projects import configure_project_archive
 
 
 def create_cli(*, transport: Transport | None = None) -> click.Group:
@@ -311,11 +314,11 @@ def _project_zip(
     *, source: PreparedSource, configuration: bytes | None
 ) -> bytes:
     """Package prepared starter files for the released SDK's ZIP API."""
-    with BytesIO() as buffer:
-        with ZipFile(
-            file=buffer, mode="w", compression=ZIP_DEFLATED
-        ) as archive:
-            if source.directory is None:
+    if source.directory is None:
+        with BytesIO() as buffer:
+            with ZipFile(
+                file=buffer, mode="w", compression=ZIP_DEFLATED
+            ) as archive:
                 info = ZipInfo(filename=Path(source.files[0]).name)
                 info.external_attr = source.file_mode << 16
                 archive.writestr(
@@ -323,12 +326,12 @@ def _project_zip(
                     data=source.contents,
                     compress_type=ZIP_DEFLATED,
                 )
-            else:
-                for name in source.files:
-                    archive.write(
-                        filename=source.directory / name, arcname=name
-                    )
-        contents = buffer.getvalue()
+            contents = buffer.getvalue()
+    else:
+        contents = build_project_archive(
+            directory=source.directory,
+            files=[Path(name) for name in source.files],
+        )
     if configuration is None:
         return contents
     return configure_project_archive(

@@ -99,7 +99,7 @@ Other files and their executable permissions are preserved.
 Dry runs validate the configuration and include ``hackerrank.yml`` in the file
 listing without credentials or network requests.
 
-Python callers can render explicit values and configure a prepared ZIP:
+Python callers can install ``hackerrank[projects]`` to configure a prepared ZIP.
 
 .. code-block:: python
 
@@ -107,7 +107,7 @@ Python callers can render explicit values and configure a prepared ZIP:
 
    from pathlib import Path
 
-   from hackerrank_cli.projects import (
+   from hackerrank.projects import (
        ProjectConfiguration,
        configure_project_archive,
    )
@@ -174,7 +174,7 @@ Directory selection
   Empty selections fail.
   Selected files are copied to a temporary directory without dereferencing
   links.
-  The CLI packages these prepared files with Python's standard ZIP library.
+  The CLI packages these prepared files through the SDK.
   The released SDK handles multipart serialization, authentication, network
   requests, response decoding, and retries.
 
