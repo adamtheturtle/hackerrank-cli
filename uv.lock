@@ -765,8 +765,8 @@ wheels = [
 
 [[package]]
 name = "hackerrank"
-version = "2026.11.10.4.post62+g555cc426a"
-source = { git = "https://github.com/adamtheturtle/hackerrank.git?rev=555cc426a0d214f94e13908f327e69e4a310ed9e#555cc426a0d214f94e13908f327e69e4a310ed9e" }
+version = "2026.11.10.4.post56+g71035b10f"
+source = { git = "https://github.com/adamtheturtle/hackerrank.git?rev=71035b10fa215e692b2fc38e19a51aa1b182c15e#71035b10fa215e692b2fc38e19a51aa1b182c15e" }
 dependencies = [
     { name = "beartype" },
     { name = "httpx" },
@@ -845,7 +845,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = ">=8.3,<8.6" },
-    { name = "hackerrank", git = "https://github.com/adamtheturtle/hackerrank.git?rev=555cc426a0d214f94e13908f327e69e4a310ed9e" },
+    { name = "hackerrank", git = "https://github.com/adamtheturtle/hackerrank.git?rev=71035b10fa215e692b2fc38e19a51aa1b182c15e" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "httpx2", specifier = ">=2.12" },
     { name = "pathspec", specifier = ">=1" },
