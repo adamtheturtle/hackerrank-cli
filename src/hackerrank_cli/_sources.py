@@ -193,7 +193,7 @@ def prepare_source(
     directory: Path | None,
     file: Path | None,
     excludes: tuple[str, ...],
-    git_index: bool = False,
+    git_index: bool,
 ) -> Generator[PreparedSource]:
     """Read or stage everything before allowing a network mutation."""
     if file is not None:
