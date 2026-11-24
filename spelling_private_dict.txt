@@ -59,6 +59,7 @@ scm
 setuptools
 src
 stdin
+submodules
 symlink
 symlinks
 uploader

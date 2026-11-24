@@ -129,6 +129,11 @@ Directory selection
   This layer can exclude files re-included by ``.gitignore``.
   Later negations in this layer take precedence over its earlier patterns.
   It cannot re-include a file excluded by ``.gitignore`` or Git metadata.
+* Use ``--git-index`` with ``--directory`` in a Git checkout or linked worktree
+  to include existing tracked files even if ``.gitignore`` matches them.
+  Repository ignore rules still filter files Git does not track, and
+  ``--exclude`` applies to every selected file.
+  Both commands skip deleted files and submodules in this mode.
 * ZIP files are included by default.
   Use ``--exclude '*.zip'`` to omit them.
   Add other exclusions explicitly, such as ``--exclude node_modules/``.
