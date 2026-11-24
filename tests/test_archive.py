@@ -213,7 +213,9 @@ def test_git_index_selection(tmp_path: Path) -> None:
 def test_git_index_requires_checkout(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, missing_git: bool
 ) -> None:
-    """Fail before producing archive bytes if Git cannot enumerate files."""
+    """Fail before producing archive bytes if Git cannot enumerate
+    files.
+    """
     message = "requires Git" if missing_git else "in a Git checkout"
     if missing_git:
         monkeypatch.setenv(name="PATH", value=str(object=tmp_path))

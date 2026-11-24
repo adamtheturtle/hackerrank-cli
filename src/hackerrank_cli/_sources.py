@@ -125,7 +125,9 @@ def selected_files(
 def indexed_files(
     *, directory: Path, excludes: tuple[str, ...]
 ) -> tuple[Path, ...]:
-    """List tracked and non-ignored untracked paths from a Git checkout."""
+    """List tracked and non-ignored untracked paths from a Git
+    checkout.
+    """
     git = which(cmd="git")
     if git is None:
         msg = "--git-index requires Git."
