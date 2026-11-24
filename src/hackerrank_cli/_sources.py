@@ -1,15 +1,14 @@
 """Prepare local sources before handing them to the SDK."""
 
-import os
 import stat
-import subprocess
 from collections.abc import Generator, Iterator, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from shutil import copyfile, copymode, which
+from shutil import copyfile, copymode
 from tempfile import TemporaryDirectory
 
+from hackerrank.projects import git_index_project_files
 from pathspec import GitIgnoreSpec
 
 
@@ -126,39 +125,9 @@ def indexed_files(
     *, directory: Path, excludes: tuple[str, ...]
 ) -> tuple[Path, ...]:
     """List paths from the Git index and repository ignore rules."""
-    git = which(cmd="git")
-    if git is None:
-        msg = "--git-index requires Git."
-        raise ValueError(msg)
-    try:
-        result = subprocess.run(  # noqa: S603 - Fixed Git arguments.
-            args=[
-                git,
-                "ls-files",
-                "-z",
-                "--cached",
-                "--others",
-                "--exclude-per-directory=.gitignore",
-                "--",
-                ".",
-            ],
-            cwd=directory,
-            check=True,
-            capture_output=True,
-        )
-    except subprocess.CalledProcessError as error:
-        msg = "--git-index requires a source directory in a Git checkout."
-        raise ValueError(msg) from error
-
     exclusion_spec = GitIgnoreSpec.from_lines(lines=excludes)
     files: list[Path] = []
-    for relative in sorted(
-        {
-            Path(os.fsdecode(filename=name))
-            for name in result.stdout.split(sep=b"\0")
-            if name != b""
-        }
-    ):
+    for relative in git_index_project_files(directory=directory):
         if exclusion_spec.match_file(file=relative.as_posix()) or any(
             exclusion_spec.match_file(file=parent.as_posix() + "/")
             for parent in relative.parents
