@@ -1,4 +1,6 @@
-"""Compatibility exports for the native configuration API now in the SDK."""
+"""Compatibility exports for the native configuration API now in the
+SDK.
+"""
 
 from hackerrank.projects import (
     ProjectConfiguration,
