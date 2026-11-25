@@ -216,7 +216,6 @@ num_workers = "auto"
 [tool.pyrefly]
 project-excludes = [ "src/hackerrank_cli/_version.py" ]
 search-path = [ "." ]
-errors.non-exhaustive-match = "error"
 disable-project-excludes-heuristics = true
 enabled-ignores = [ "pyrefly" ]
 preset = "all"
