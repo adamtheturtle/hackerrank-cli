@@ -30,7 +30,7 @@ reviewed in the repository where they are defined.
 Explicit project files
 ----------------------
 
-If you used ``--git-index``, replace it with one ``--include`` option per file.
+To select exact project files, pass one ``--include`` option per file.
 The paths are relative to ``--directory`` and work in any project directory.
 
 .. code-block:: shell
