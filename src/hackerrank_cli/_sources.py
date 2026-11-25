@@ -8,7 +8,6 @@ from pathlib import Path
 from shutil import copyfile, copymode
 from tempfile import TemporaryDirectory
 
-from hackerrank.projects import git_index_project_files
 from pathspec import GitIgnoreSpec
 
 
@@ -121,27 +120,23 @@ def selected_files(
     return tuple(walk(parent=directory, rules=inherited))
 
 
-def indexed_files(
-    *, directory: Path, excludes: tuple[str, ...]
+def _explicit_files(
+    *, directory: Path, includes: tuple[Path, ...]
 ) -> tuple[Path, ...]:
-    """List paths from the Git index and repository ignore rules."""
-    exclusion_spec = GitIgnoreSpec.from_lines(lines=excludes)
-    files: list[Path] = []
-    for relative in git_index_project_files(directory=directory):
-        if exclusion_spec.match_file(file=relative.as_posix()) or any(
-            exclusion_spec.match_file(file=parent.as_posix() + "/")
-            for parent in relative.parents
-            if parent != Path()
-        ):
-            continue
+    """Validate exact file paths before using them to stage a project."""
+    if len(includes) != len(set(includes)):
+        msg = "Duplicate --include paths."
+        raise ValueError(msg)
+    for relative in includes:
+        if relative.anchor != "" or ".." in relative.parts:
+            msg = f"Expected a relative project file path: {relative}"
+            raise ValueError(msg)
         path = directory / relative
         validate_path(path=path)
-        if not path.exists() or path.is_dir():
-            # Git may list paths without file contents to package.
-            continue
-        require_regular_file(path=path)
-        files.append(relative)
-    return tuple(files)
+        if not path.is_file():
+            msg = f"Project file must be a regular file: {relative}"
+            raise ValueError(msg)
+    return tuple(sorted(includes))
 
 
 @dataclass(frozen=True)
@@ -160,7 +155,7 @@ def prepare_source(
     directory: Path | None,
     file: Path | None,
     excludes: tuple[str, ...],
-    git_index: bool,
+    includes: tuple[Path, ...],
 ) -> Generator[PreparedSource]:
     """Read or stage everything before allowing a network mutation."""
     if file is not None:
@@ -186,8 +181,8 @@ def prepare_source(
         msg = f"Not a directory: {directory}"
         raise ValueError(msg)
     files = (
-        indexed_files(directory=directory, excludes=excludes)
-        if git_index
+        _explicit_files(directory=directory, includes=includes)
+        if len(includes) > 0
         else selected_files(directory=directory, excludes=excludes)
     )
     if len(files) == 0:
