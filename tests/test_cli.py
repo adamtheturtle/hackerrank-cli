@@ -338,7 +338,7 @@ def test_nested_ignore_precedence(git_marker: str, tmp_path: Path) -> None:
         },
     )
     with prepare_source(
-        directory=project, file=None, excludes=("*.zip",), git_index=False
+        directory=project, file=None, excludes=("*.zip",), includes=()
     ) as source:
         expected: tuple[str, ...] = (
             ".gitignore",
@@ -380,7 +380,7 @@ def test_final_exclusion_negations(tmp_path: Path) -> None:
         directory=tmp_path,
         file=None,
         excludes=("*.zip", "!keep.zip", "!ignored.zip", "!.git"),
-        git_index=False,
+        includes=(),
     ) as source:
         assert source.files == (".gitignore", "keep.zip")
 
