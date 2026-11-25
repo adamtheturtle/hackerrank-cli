@@ -148,7 +148,9 @@ def test_preparation_failure(tmp_path: Path) -> None:
 
 
 def test_explicit_file_selection(tmp_path: Path) -> None:
-    """Archive, dry run, and upload agree on the exact files without Git."""
+    """Archive, dry run, and upload agree on the exact files without
+    Git.
+    """
     _ = (tmp_path / ".gitignore").write_text(data="*.db\n")
     (tmp_path / "scratch.txt").touch()
     fixture = tmp_path / "test data.db"

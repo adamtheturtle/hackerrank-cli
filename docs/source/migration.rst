@@ -36,7 +36,7 @@ The paths are relative to ``--directory`` and work in any project directory.
 .. code-block:: shell
 
    hackerrank questions upload 123456 --directory ./starter --include solution.py \
-      --include fixtures/sample.db --dry-run
+       --include fixtures/sample.db --dry-run
 
 Local validation
 ----------------
