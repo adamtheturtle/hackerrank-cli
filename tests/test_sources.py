@@ -67,7 +67,7 @@ def test_ignored_links_and_git_metadata(tmp_path: Path) -> None:
     (source / "excluded").symlink_to(target=outside)
     (source / ".git").symlink_to(target=outside)
     with prepare_source(
-        directory=source, file=None, excludes=("excluded",), git_index=False
+        directory=source, file=None, excludes=("excluded",), includes=()
     ) as prepared:
         assert prepared.files == (".gitignore", "main.py")
         assert prepared.directory is not None
@@ -89,7 +89,7 @@ def test_symlink_ancestor_rejected(mode: str, tmp_path: Path) -> None:
     with (
         pytest.raises(expected_exception=ValueError, match="Symbolic links"),
         prepare_source(
-            directory=directory, file=source_file, excludes=(), git_index=False
+            directory=directory, file=source_file, excludes=(), includes=()
         ),
     ):
         pytest.fail(reason="Preparation must reject the ancestor link.")
@@ -99,9 +99,7 @@ def test_no_source() -> None:
     """The preparation API also rejects absent sources."""
     with (
         pytest.raises(expected_exception=ValueError, match="exactly one"),
-        prepare_source(
-            directory=None, file=None, excludes=(), git_index=False
-        ),
+        prepare_source(directory=None, file=None, excludes=(), includes=()),
     ):
         pytest.fail(reason="Preparation must reject absent sources.")
 
@@ -176,7 +174,7 @@ def test_ancestor_and_deeper_negations(tmp_path: Path) -> None:
         },
     )
     with prepare_source(
-        directory=root / "project", file=None, excludes=(), git_index=False
+        directory=root / "project", file=None, excludes=(), includes=()
     ) as source:
         assert source.files == (".gitignore", "ignored/keep.py", "keep.tmp")
 
