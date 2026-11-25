@@ -3,20 +3,30 @@ transport.
 """
 
 import json as jsonlib
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, override
+from typing import BinaryIO, TypeGuard, override
 
 import httpx
 import pytest
 import respx
 from click.testing import CliRunner
-from hackerrank.api import api_operations
+from hackerrank.api import api_operations, parse_api_object
 from hackerrank.transports import Transport, TransportResponse
 from hackerrank.types import JSONValue
 
 from hackerrank_cli import create_cli
+
+
+def _is_json_array(value: object, /) -> TypeGuard[Sequence[object]]:
+    """Check whether the JSON decoder returned an array."""
+    return isinstance(value, list)
+
+
+def _is_json_object(value: object, /) -> TypeGuard[Mapping[object, object]]:
+    """Check whether the JSON decoder returned an object."""
+    return isinstance(value, dict)
 
 
 def test_template_list_and_selected_detail(
@@ -57,9 +67,15 @@ def test_template_list_and_selected_detail(
             catch_exceptions=False,
         )
         assert listed.exit_code == 0
-        data = jsonlib.loads(s=listed.output)["data"]
+        data = parse_api_object(text=listed.output)["data"]
         assert data == page
-        selected_id = data["data"][1]["id"]
+        assert _is_json_object(data)
+        returned_templates = data["data"]
+        assert _is_json_array(returned_templates)
+        selected_template = returned_templates[1]
+        assert _is_json_object(selected_template)
+        selected_id = selected_template["id"]
+        assert isinstance(selected_id, str)
         shown = CliRunner().invoke(
             cli=cli,
             args=[
@@ -72,7 +88,7 @@ def test_template_list_and_selected_detail(
             catch_exceptions=False,
         )
     assert shown.exit_code == 0
-    assert jsonlib.loads(s=shown.output)["data"] == templates[1]
+    assert parse_api_object(text=shown.output)["data"] == templates[1]
 
 
 @dataclass
@@ -167,7 +183,7 @@ def test_every_documented_operation_is_runnable(
             if operation.scim
             else "Bearer v3-synthetic"
         )
-        assert jsonlib.loads(s=result.output)["data"] == {"ok": True}
+        assert parse_api_object(text=result.output)["data"] == {"ok": True}
 
 
 @pytest.mark.parametrize(argnames="dry_run", argvalues=[False, True])
@@ -217,16 +233,24 @@ def test_catalogue_help_and_schema_need_no_credentials() -> None:
     listed = CliRunner().invoke(
         cli=cli, args=["api", "operations"], catch_exceptions=False
     )
-    assert {
-        value["operation"] for value in jsonlib.loads(s=listed.output)
-    } == set(api_operations())
+    catalogue: object = jsonlib.loads(s=listed.output)
+    assert _is_json_array(catalogue)
+    operations: set[str] = set()
+    for row in catalogue:
+        assert _is_json_object(row)
+        operation = row["operation"]
+        assert isinstance(operation, str)
+        operations.add(operation)
+    assert operations == set(api_operations())
     described = CliRunner().invoke(
         cli=cli,
         args=["api", "describe", "api_create_user"],
         catch_exceptions=False,
     )
-    description = jsonlib.loads(s=described.output)
-    assert description["operation"]["body_required"] is True
+    description = parse_api_object(text=described.output)
+    schema = description["operation"]
+    assert _is_json_object(schema)
+    assert schema["body_required"] is True
     invalid = CliRunner().invoke(cli=cli, args=["api", "describe", "missing"])
     assert invalid.exit_code != 0
     for args in [
@@ -294,7 +318,7 @@ def test_dry_run_and_stdin_body(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     assert saved.exit_code == 0
     assert transport.requests[-1][4] == {"content": "  line\r\n"}
-    assert jsonlib.loads(s=saved.output)["data"] is None
+    assert parse_api_object(text=saved.output)["data"] is None
     invalid = CliRunner().invoke(cli=cli, args=args, input="broken")
     assert invalid.exit_code != 0
 
