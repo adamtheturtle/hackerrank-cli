@@ -13,13 +13,15 @@ from hackerrank_cli import main
 @pytest.mark.parametrize(
     argnames="arguments",
     argvalues=[
-        [],
-        ["questions"],
-        ["questions", "upload"],
-        ["questions", "archive"],
-        ["questions", "set-system-prompt"],
+        pytest.param([], id="root"),
+        pytest.param(["questions"], id="questions"),
+        pytest.param(["questions", "upload"], id="questions-upload"),
+        pytest.param(["questions", "archive"], id="questions-archive"),
+        pytest.param(
+            ["questions", "set-system-prompt"],
+            id="questions-set-system-prompt",
+        ),
     ],
-    ids=lambda arguments: "-".join(arguments) or "root",
 )
 def test_help(
     arguments: list[str], file_regression: FileRegressionFixture
